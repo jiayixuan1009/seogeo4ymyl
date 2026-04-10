@@ -10,7 +10,7 @@ export function analyzeSiteData(nodes, edges, insights) {
   if (orphans.length > 0) {
     actions.push({
       execPriority: 'P0',
-      title: \`发现 \${orphans.length} 个孤岛页面 (Orphan Pages)\`,
+      title: `发现 ${orphans.length} 个孤岛页面 (Orphan Pages)`,
       importance: '页面没有任何同站链接导入，搜索引擎爬虫无法发现，且无法传递权重。由于是单页抓取限制或是真正的孤岛。',
       riskOfNotDoing: '这些页面将几乎无法获得搜索流量',
       benefitOfDoing: '建立全站链接网可迅速提升这些隐藏页面的收录率',
@@ -23,7 +23,7 @@ export function analyzeSiteData(nodes, edges, insights) {
   if (broken.length > 0) {
     actions.push({
       execPriority: 'P0',
-      title: \`发现 \${broken.length} 个内部死链 (Broken Inlinks)\`,
+      title: `发现 ${broken.length} 个内部死链 (Broken Inlinks)`,
       importance: '含有 404 返回码的链接会严重伤害爬虫预算和用户的浏览体验。',
       riskOfNotDoing: '浪费爬虫抓取配额，流失用户',
       benefitOfDoing: '阻断“漏水”，引导向正确着陆页',
@@ -37,7 +37,7 @@ export function analyzeSiteData(nodes, edges, insights) {
   if (deepPages.length > 0) {
     actions.push({
       execPriority: 'P1',
-      title: \`发现 \${deepPages.length} 个过深层级页面 (Click Depth >= 4)\`,
+      title: `发现 ${deepPages.length} 个过深层级页面 (Click Depth >= 4)`,
       importance: '距离首页超过 3 次点击的页面很难被搜索引擎赋予高权重。',
       riskOfNotDoing: '核心转化页排名受阻',
       benefitOfDoing: '架构扁平化有助于权重迅速传导',

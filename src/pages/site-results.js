@@ -91,24 +91,24 @@ export function renderSiteActions(actions) {
 
   const html = actions.map(act => {
     const isP0 = act.execPriority === 'P0';
-    return \`
-      <div class="glass-card" style="margin-bottom:var(--space-3);border-left:3px solid \${isP0 ? 'var(--accent-red)' : 'var(--accent-orange)'}">
+    return `
+      <div class="glass-card" style="margin-bottom:var(--space-3);border-left:3px solid ${isP0 ? 'var(--accent-red)' : 'var(--accent-orange)'}">
         <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2)">
-          <span class="badge" style="background:\${isP0 ? 'var(--accent-red)' : 'var(--accent-orange)'}22;color:\${isP0 ? 'var(--accent-red)' : 'var(--accent-orange)'}">\${act.execPriority}</span>
-          <h4 style="margin:0;font-size:var(--font-size-base)">\${act.title}</h4>
+          <span class="badge" style="background:${isP0 ? 'var(--accent-red)' : 'var(--accent-orange)'}22;color:${isP0 ? 'var(--accent-red)' : 'var(--accent-orange)'}">${act.execPriority}</span>
+          <h4 style="margin:0;font-size:var(--font-size-base)">${act.title}</h4>
         </div>
-        \${act.importance ? \`<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px">\${act.importance}</div>\` : ''}
+        ${act.importance ? `<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px">${act.importance}</div>` : ''}
         <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:4px;font-size:13px;color:var(--text-primary);">
-          <strong>👉 建议行动：</strong> \${act.action}
+          <strong>👉 建议行动：</strong> ${act.action}
         </div>
-        \${act.list && act.list.length > 0 ? \`
+        ${act.list && act.list.length > 0 ? `
           <details style="margin-top:8px;font-size:11px;color:var(--text-muted);cursor:pointer">
-            <summary>查看受影响的 URL (\${act.list.length})</summary>
-            <div style="padding-top:4px;white-space:pre-wrap;word-break:break-all">\${act.list.join('\\n')}</div>
+            <summary>查看受影响的 URL (${act.list.length})</summary>
+            <div style="padding-top:4px;white-space:pre-wrap;word-break:break-all">${act.list.join('\n')}</div>
           </details>
-        \` : ''}
+        ` : ''}
       </div>
-    \`;
+    `;
   }).join('');
 
   container.innerHTML = html;
