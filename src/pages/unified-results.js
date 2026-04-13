@@ -503,8 +503,7 @@ function rwCompareShort(id, icon, label, currentVal, maxLen, promptAttr) {
             style="width:100%;box-sizing:border-box;background:rgba(34,197,94,0.05);
               border:1px solid rgba(34,197,94,0.2);color:var(--text-primary);
               padding:9px 11px;border-radius:5px;font-size:12px;line-height:1.5;
-              resize:vertical;font-family:inherit;transition:border-color 0.2s"
-            placeholder="⏳ 正在生成..."
+            placeholder="暂无 AI 输出..."
             data-rw-sync data-rw-id="${id}"
           >${escapedCurrent}</textarea>
         </div>
@@ -531,7 +530,7 @@ function rwCompareLong(id, icon, label, promptAttr, rows = 5, previewMaxLen = 18
           border:1px solid rgba(34,197,94,0.2);color:var(--text-primary);
           padding:9px 11px;border-radius:5px;font-size:12px;line-height:1.6;
           resize:vertical;font-family:inherit;margin-bottom:var(--space-2)"
-        placeholder="⏳ 正在生成..."
+        placeholder="暂无 AI 输出..."
         data-rw-sync data-rw-id="${id}"
       ></textarea>
     </div>`;
