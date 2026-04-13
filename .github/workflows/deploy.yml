@@ -12,8 +12,10 @@ on:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
+# setup-node 的 cache: npm 会读/写 Actions Cache，需 actions: write（仅 contents: read 时缓存步骤会 403 导致整 job 失败）
 permissions:
   contents: read
+  actions: write
 
 concurrency:
   group: deploy-seotool
