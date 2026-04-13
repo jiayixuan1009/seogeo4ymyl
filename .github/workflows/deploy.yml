@@ -1,7 +1,9 @@
-# Job build：安装依赖 + 构建（应始终在无代码问题时通过）
-# Job deploy：仅在配置了 4 个 Secret 时 rsync + 远程 npm ci + PM2；未配置则跳过（success）
+# 第一性原理：
+# - 「能否构建」是 CI 的唯一硬门槛 → build 失败 = 整条 workflow 失败（应修复代码）。
+# - 「是否成功上云」依赖密钥、网络、服务器环境 → 与代码正确性正交 → 不得绑架绿勾。
+#   故 deploy job 使用 continue-on-error: true：SSH/rsync/PM2 失败时仅标黄，Summary 仍为成功。
 #
-# Secrets：DEPLOY_HOST, DEPLOY_USER, DEPLOY_PATH, DEPLOY_SSH_KEY（可选 DEPLOY_SSH_PORT）
+# Secrets（仅 deploy 需要）：DEPLOY_HOST, DEPLOY_USER, DEPLOY_PATH, DEPLOY_SSH_KEY（可选 DEPLOY_SSH_PORT）
 
 name: Deploy to server
 
@@ -43,8 +45,9 @@ jobs:
 
   deploy:
     needs: build
+    # 部署失败不导致 workflow 失败（GitHub 会在本 job 上显示警告，便于你点开看日志）
+    continue-on-error: true
     runs-on: ubuntu-latest
-    # 未配齐 Secret 时不跑部署（避免 ssh/rsync 误失败拖红整单）
     if: ${{ secrets.DEPLOY_HOST != '' && secrets.DEPLOY_USER != '' && secrets.DEPLOY_PATH != '' && secrets.DEPLOY_SSH_KEY != '' }}
     steps:
       - uses: actions/checkout@v6
