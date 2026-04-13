@@ -77,23 +77,12 @@ export const READINESS_LABELS = {
   NEEDS_WORK:  { label: '🟡 Needs Modernization',      color: 'var(--accent-gold)' },
 };
 
-// === Competitor Presets ===
-export const COMPETITOR_PRESETS = {
-  // BiYaPay 主要竞品（汇款 / 跨境支付）
-  biyapay:    ['https://wise.com', 'https://www.pandaremit.com', 'https://www.remitly.com'],
-  remittance: ['https://wise.com', 'https://www.worldremit.com', 'https://www.westernunion.com'],
-  crypto:     ['https://www.binance.com', 'https://www.okx.com', 'https://www.coinbase.com'],
-  stocks:     ['https://www.futunn.com', 'https://moomoo.com', 'https://www.interactivebrokers.com'],
-};
 
 // === CORS Proxy Configuration ===
 // NOTE: 后续接阿里云服务器时，在此数组最前面插入私有代理地址即可切换，无需改其他代码。
 // 示例: { name: 'private', url: (u) => `https://YOUR_ALIYUN_PROXY/fetch?url=${encodeURIComponent(u)}` }
 export const CORS_PROXIES = [
   { name: 'private-node', url: (u) => `/api/proxy?url=${encodeURIComponent(u)}` }, // 本地与阿里云专属私有后端代理
-  { name: 'allorigins',   url: (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}` },
-  { name: 'corsproxy',    url: (u) => `https://corsproxy.io/?${encodeURIComponent(u)}` },
-  { name: 'corsanywhere', url: (u) => `https://cors-anywhere.herokuapp.com/${u}` },
 ];
 
 export const FETCH_TIMEOUT_MS = 10000;

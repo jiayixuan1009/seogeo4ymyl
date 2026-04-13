@@ -38,8 +38,21 @@ const apiLimiter = rateLimit({
 
 app.use('/api/', apiLimiter);
 
-// Enable CORS for frontend connection compatibility
-app.use(cors());
+// Enable CORS for frontend connection compatibility (restricted to known origins)
+const allowedOrigins = [
+  'https://seo.cryptooptiontool.com',
+  /^http:\/\/localhost(:\d+)?$/,
+  /^http:\/\/127\.0\.0\.1(:\d+)?$/,
+];
+app.use(cors({
+  origin: (origin, cb) => {
+    // Allow server-to-server (no origin) and matched origins
+    if (!origin || allowedOrigins.some(o => o instanceof RegExp ? o.test(origin) : o === origin)) {
+      return cb(null, true);
+    }
+    cb(new Error('CORS: origin not allowed'));
+  },
+}));
 
 // Setup JSON body parsing with strict size limits (5MB max for LLM prompts)
 app.use(express.json({ limit: '5mb' }));
@@ -133,6 +146,8 @@ const insecureDispatcher = new Agent({
   connect: { rejectUnauthorized: false },
 });
 
+const MAX_LLM_RESPONSE_BYTES = 5 * 1024 * 1024; // 5 MB cap for LLM streaming responses
+
 // ==========================================
 // 🌐 PROXY ENDPOINTS
 // ==========================================
@@ -167,7 +182,7 @@ app.get('/api/proxy', async (req, res) => {
     const text = await readResponseBodyWithLimit(response, MAX_PROXY_BODY_BYTES);
     res.send(text);
   } catch (error) {
-    console.error(`Scrape Proxy error for ${targetUrl}:`, error.message);
+    console.error(`Scrape Proxy error for ${targetUrl} (insecure TLS):`, error.message);
     if (error.code === 'RESPONSE_TOO_LARGE') {
       return res.status(413).json({ error: 'Response payload too large (> 10MB)' });
     }
@@ -205,8 +220,16 @@ app.post('/api/llm-proxy', async (req, res) => {
     res.setHeader('Connection', 'keep-alive');
 
     if (fetchResponse.body) {
+      let llmBytes = 0;
       for await (const chunk of fetchResponse.body) {
-        res.write(chunk);
+        const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+        llmBytes += buf.length;
+        if (llmBytes > MAX_LLM_RESPONSE_BYTES) {
+          console.warn(`LLM response exceeded ${MAX_LLM_RESPONSE_BYTES} bytes, truncating`);
+          res.end();
+          return;
+        }
+        res.write(buf);
       }
     }
     res.end();

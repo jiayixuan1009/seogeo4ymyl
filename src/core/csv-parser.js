@@ -1,5 +1,5 @@
-import Papa from 'papaparse';
-import * as XLSX from 'xlsx';
+// ===== SEOGEO4YMYL — CSV / XLSX Parser (lazy-loaded) =====
+// papaparse and exceljs are dynamically imported to keep the main bundle small.
 
 /**
  * Screaming Frog field mapping
@@ -214,6 +214,7 @@ function processRows(rows) {
 
 /**
  * Parse a Screaming Frog CSV or XLSX file.
+ * Libraries are loaded lazily via dynamic import() for code-splitting.
  * @param {File} file
  * @returns {Promise<{nodes, edges, insights}>}
  */
@@ -226,7 +227,8 @@ export function parseScreamingFrogCSV(file) {
   return parseCsv(file);
 }
 
-function parseCsv(file) {
+async function parseCsv(file) {
+  const Papa = (await import('papaparse')).default;
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
       header: true,
@@ -243,23 +245,32 @@ function parseCsv(file) {
   });
 }
 
-function parseXlsx(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        // Use first sheet
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-        resolve(processRows(rows));
-      } catch (err) {
-        reject(new Error('XLSX 解析失败：' + err.message));
-      }
-    };
-    reader.onerror = () => reject(new Error('文件读取失败'));
-    reader.readAsArrayBuffer(file);
+async function parseXlsx(file) {
+  const ExcelJS = (await import('exceljs')).default;
+  const arrayBuffer = await file.arrayBuffer();
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(arrayBuffer);
+
+  const sheet = workbook.worksheets[0];
+  if (!sheet) throw new Error('XLSX 文件中未找到工作表');
+
+  // Convert ExcelJS sheet to plain row objects (header row → keys)
+  const rows = [];
+  const headers = [];
+  sheet.eachRow((row, rowNumber) => {
+    if (rowNumber === 1) {
+      row.eachCell((cell, colNumber) => {
+        headers[colNumber] = String(cell.value || '').trim();
+      });
+    } else {
+      const obj = {};
+      row.eachCell((cell, colNumber) => {
+        const key = headers[colNumber];
+        if (key) obj[key] = cell.value != null ? String(cell.value) : '';
+      });
+      if (Object.keys(obj).length > 0) rows.push(obj);
+    }
   });
+
+  return processRows(rows);
 }

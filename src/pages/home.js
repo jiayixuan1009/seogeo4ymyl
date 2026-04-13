@@ -217,7 +217,6 @@ export function renderHomePage() {
 
     // ── LLM Config Bar (persistent) ───────────────────────────────────────────
     const llmBaseUrlInput = root.querySelector('#llm-base-url');
-    const llmApiKeyInput  = root.querySelector('#llm-api-key');
     const llmModelInput   = root.querySelector('#llm-model');
     const llmSaveBtn      = root.querySelector('#llm-save-home');
     const llmStatusBadge  = root.querySelector('#llm-status-badge');
@@ -242,7 +241,7 @@ export function renderHomePage() {
       const baseUrl = llmBaseUrlInput.value.trim() || DEFAULT_CONFIG.baseUrl;
       const model   = llmModelInput.value.trim()   || DEFAULT_CONFIG.model;
 
-      localStorage.setItem('seotool_llm_config', JSON.stringify({ baseUrl, model }));
+      saveLlmConfig({ baseUrl, apiKey: '', model });
       updateLlmBadge({ baseUrl, model });
       
       if (llmSaveBtn) {
@@ -254,7 +253,7 @@ export function renderHomePage() {
 
     if (llmSaveBtn)     llmSaveBtn.addEventListener('click', saveLlmFromBar);
     // Also save on Enter in any LLM field
-    [llmBaseUrlInput, llmApiKeyInput, llmModelInput].forEach(el => {
+    [llmBaseUrlInput, llmModelInput].forEach(el => {
       if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') saveLlmFromBar(); });
     });
 
@@ -269,7 +268,7 @@ export function renderHomePage() {
         root.querySelectorAll('.llm-preset-btn').forEach(b => b.style.outline = 'none');
         btn.style.outline = '2px solid var(--accent-blue)';
         // Focus API key field so user pastes their key
-        llmApiKeyInput?.focus();
+        llmModelInput?.focus();
       });
     });
 

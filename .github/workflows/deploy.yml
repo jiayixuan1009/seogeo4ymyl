@@ -48,9 +48,8 @@ jobs:
           test -f dist/index.html
           ls -la dist/
 
-      # 与原先 deploy job 等价；失败不导致整 job 失败（等同原 continue-on-error: true）
+      # Deploy via rsync + PM2 reload
       - name: Rsync dist + Node 入口，并 reload PM2
-        continue-on-error: true
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
