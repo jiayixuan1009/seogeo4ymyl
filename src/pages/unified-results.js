@@ -14,9 +14,9 @@ export function renderUnifiedResults(result) {
 
   return `
     <div class="container" style="padding-top:var(--space-4);padding-bottom:var(--space-10)">
-      <div style="display:flex;justify-content:flex-end;margin-bottom:var(--space-3)">
-        <button id="open-llm-settings" class="btn btn-ghost"
-          style="font-size:10px;background:transparent;color:var(--text-muted);padding:3px 8px;opacity:0.6"
+      <div class="flex justify-end mb-3">
+        <button id="open-llm-settings" class="btn btn-ghost text-[10px] text-muted"
+          style="background:transparent; padding:3px 8px; opacity:0.6"
           title="AI 功能需在首页配置 LLM 设置">⚙️ LLM 设置</button>
       </div>
       ${renderSummaryLayer(summary, meta)}
@@ -35,9 +35,9 @@ export function renderUnifiedResults(result) {
 
 function renderSummaryLayer(summary, meta) {
   const metricsHtml = summary.metrics.map(m => `
-    <div style="text-align:center">
-      <div style="font-size:var(--font-size-xs);color:var(--text-muted);margin-bottom:4px">${esc(m.label)}</div>
-      <div style="font-size:var(--font-size-lg);font-weight:800;color:${m.color}">${esc(m.value)}</div>
+    <div class="text-center">
+      <div class="text-xs text-muted" style="margin-bottom:4px">${esc(m.label)}</div>
+      <div class="text-lg font-extrabold" style="color:${m.color}">${esc(m.value)}</div>
     </div>
   `).join('');
 
@@ -47,32 +47,32 @@ function renderSummaryLayer(summary, meta) {
     const level = score >= 70 ? '高' : score >= 40 ? '中' : '低';
     const levelColor = score >= 70 ? 'var(--accent-green)' : score >= 40 ? 'var(--accent-gold)' : 'var(--accent-red)';
     return `
-      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2)">
-        <span style="font-size:var(--font-size-xs);color:var(--text-muted);width:70px;flex-shrink:0">${dim.icon} ${esc(dim.label)}</span>
+      <div class="flex items-center gap-3 mb-2">
+        <span class="text-xs text-muted shrink-0" style="width:70px">${dim.icon} ${esc(dim.label)}</span>
         <div style="flex:1;height:6px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden">
           <div style="height:100%;width:${score}%;background:${levelColor};border-radius:3px;transition:width 1s ease"></div>
         </div>
-        <span style="font-size:var(--font-size-sm);font-weight:700;color:${levelColor};width:24px;text-align:right">${level}</span>
+        <span class="text-sm font-bold text-right" style="color:${levelColor}; width:24px">${level}</span>
       </div>
     `;
   }).join('');
 
   return `
-    <div class="glass-card animate-fade-in" style="margin-bottom:var(--space-4);border-color:${summary.ratingColor}33">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-4);flex-wrap:wrap;gap:var(--space-4)">
+    <div class="glass-card animate-fade-in mb-4" style="border-color:${summary.ratingColor}33">
+      <div class="flex justify-between mb-4 gap-4" style="align-items:flex-start; flex-wrap:wrap">
         <div>
-          <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2)">
+          <div class="flex items-center gap-3 mb-2">
             <div style="font-size:var(--font-size-4xl);font-weight:900;color:${summary.ratingColor}">${summary.overallScore}</div>
             <div>
-              <div style="font-size:var(--font-size-lg);font-weight:700">${summary.ratingEmoji} ${esc(summary.rating)}</div>
-              <div style="font-size:var(--font-size-xs);color:${summary.readinessLabel.color}">${esc(summary.readinessLabel.label)}</div>
+              <div class="text-lg font-bold">${summary.ratingEmoji} ${esc(summary.rating)}</div>
+              <div class="text-xs" style="color:${summary.readinessLabel.color}">${esc(summary.readinessLabel.label)}</div>
             </div>
           </div>
-          <div style="font-size:var(--font-size-xs);color:var(--text-muted)">
+          <div class="text-xs text-muted">
             ${esc(safeHost(meta.url))}${meta.keyword ? ` · ${esc(meta.keyword)}` : ''}${meta.hasCompetitors ? ` · ${meta.competitorUrls.length} 竞品` : ''}
           </div>
         </div>
-        ${summary.metrics.length > 0 ? `<div style="display:flex;gap:var(--space-5);flex-wrap:wrap">${metricsHtml}</div>` : ''}
+        ${summary.metrics.length > 0 ? `<div class="gap-5" style="display:flex; flex-wrap:wrap">${metricsHtml}</div>` : ''}
       </div>
       <div>${dimBars}</div>
     </div>
@@ -89,11 +89,11 @@ function renderDecisionCard(decision) {
   const conf = Math.round(decision.confidence * 100);
 
   const reasonsHtml = decision.reasons.map(r =>
-    `<div style="display:flex;gap:var(--space-2);padding:2px 0"><span>•</span><span style="font-size:var(--font-size-xs)">${esc(r)}</span></div>`
+    `<div class="gap-2" style="display:flex; padding:2px 0"><span>•</span><span class="text-xs">${esc(r)}</span></div>`
   ).join('');
 
   const actionsHtml = decision.nextActions.map((a, i) =>
-    `<div style="display:flex;gap:var(--space-2);padding:3px 0"><span style="font-size:var(--font-size-xs);font-weight:700;color:var(--text-muted);width:16px">${i + 1}.</span><span style="font-size:var(--font-size-sm)">${esc(a)}</span></div>`
+    `<div class="gap-2" style="display:flex; padding:3px 0"><span class="text-xs font-bold text-muted" style="width:16px">${i + 1}.</span><span class="text-sm">${esc(a)}</span></div>`
   ).join('');
 
   const signals = decision.allSignals;
@@ -106,33 +106,33 @@ function renderDecisionCard(decision) {
     signals.citationLevel && `引用:${lv(signals.citationLevel)}`,
     signals.igLevel && `增益:${lv(signals.igLevel)}`,
   ].filter(Boolean).map(s =>
-    `<span style="font-size:10px;color:var(--text-muted);background:rgba(255,255,255,0.05);padding:1px 5px;border-radius:3px">${esc(s)}</span>`
+    `<span class="text-[10px] text-muted" style="background:rgba(255,255,255,0.05); padding:1px 5px; border-radius:3px">${esc(s)}</span>`
   ).join(' ') : '';
 
   return `
-    <div class="glass-card animate-slide-up" style="margin-bottom:var(--space-5);border-left:4px solid ${v.color}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-3)">
+    <div class="glass-card animate-slide-up mb-5" style="border-left:4px solid ${v.color}">
+      <div class="flex justify-between mb-3" style="align-items:flex-start">
         <div>
-          <div style="font-size:var(--font-size-xs);color:var(--text-muted);margin-bottom:var(--space-1)">决策引擎判定</div>
-          <div style="font-size:var(--font-size-xl);font-weight:800;color:${v.color}">${v.emoji} ${esc(v.label)}</div>
+          <div class="text-xs text-muted mb-1">决策引擎判定</div>
+          <div class="font-extrabold" style="font-size:var(--font-size-xl); color:${v.color}">${v.emoji} ${esc(v.label)}</div>
         </div>
-        <div style="text-align:right">
-          <div style="font-size:var(--font-size-xs);color:var(--text-muted)">置信度</div>
-          <div style="font-size:var(--font-size-lg);font-weight:800;color:${conf >= 70 ? 'var(--accent-green)' : 'var(--accent-gold)'}">${conf}%</div>
+        <div class="text-right">
+          <div class="text-xs text-muted">置信度</div>
+          <div class="text-lg font-extrabold" style="color:${conf >= 70 ? 'var(--accent-green)' : 'var(--accent-gold)'}">${conf}%</div>
         </div>
       </div>
-      <div style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-bottom:var(--space-3)">${esc(v.template)}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
+      <div class="text-sm text-secondary mb-3">${esc(v.template)}</div>
+      <div class="grid gap-4" style="grid-template-columns:1fr 1fr">
         <div style="background:rgba(0,0,0,0.12);padding:var(--space-3);border-radius:8px">
-          <div style="font-size:var(--font-size-xs);color:var(--text-muted);font-weight:600;margin-bottom:var(--space-2)">判定依据</div>
+          <div class="text-xs text-muted font-semibold mb-2">判定依据</div>
           ${reasonsHtml}
         </div>
         <div style="background:rgba(0,0,0,0.12);padding:var(--space-3);border-radius:8px">
-          <div style="font-size:var(--font-size-xs);color:var(--accent-green);font-weight:600;margin-bottom:var(--space-2)">下一步行动</div>
+          <div class="text-xs text-accent-green font-semibold mb-2">下一步行动</div>
           ${actionsHtml}
         </div>
       </div>
-      ${signalBadges ? `<div style="margin-top:var(--space-3);display:flex;gap:4px;flex-wrap:wrap"><span style="font-size:10px;color:var(--text-muted)">信号:</span>${signalBadges}</div>` : ''}
+      ${signalBadges ? `<div class="mt-3" style="display:flex; gap:4px; flex-wrap:wrap"><span class="text-[10px] text-muted">信号:</span>${signalBadges}</div>` : ''}
     </div>
   `;
 }
@@ -154,9 +154,9 @@ function renderInsightsLayer(insights, meta) {
     cards.push(renderDimensionCard(dimId, dim));
   }
   return `
-    <div style="margin-bottom:var(--space-6)">
-      <h2 style="font-size:var(--font-size-lg);font-weight:700;margin-bottom:var(--space-4)">📊 诊断详情</h2>
-      <div style="display:grid;gap:var(--space-4)">${cards.join('')}</div>
+    <div class="mb-6">
+      <h2 class="text-lg font-bold mb-4">📊 诊断详情</h2>
+      <div class="grid gap-4">${cards.join('')}</div>
     </div>
   `;
 }
@@ -167,16 +167,16 @@ function renderDimensionCard(dimId, dim) {
   const clr = score >= 70 ? 'var(--accent-green)' : score >= 40 ? 'var(--accent-gold)' : 'var(--accent-red)';
 
   const issuesHtml = dim.issues.slice(0, 5).map(item => `
-    <div style="display:flex;gap:var(--space-2);padding:var(--space-2) 0;border-bottom:1px solid rgba(255,255,255,0.04)">
-      <span style="flex-shrink:0">${item.impact === 'Critical' ? '🔴' : '🟡'}</span>
+    <div class="gap-2" style="display:flex; padding:var(--space-2) 0; border-bottom:1px solid rgba(255,255,255,0.04)">
+      <span class="shrink-0">${item.impact === 'Critical' ? '🔴' : '🟡'}</span>
       <div style="flex:1">
-        <div style="font-size:var(--font-size-sm)">${esc(item.finding)}</div>
-        ${item.fix ? `<div style="font-size:var(--font-size-xs);color:var(--accent-blue);margin-top:2px">💡 ${esc(item.fix)}</div>` : ''}
+        <div class="text-sm">${esc(item.finding)}</div>
+        ${item.fix ? `<div class="text-xs text-accent-blue" style="margin-top:2px">💡 ${esc(item.fix)}</div>` : ''}
       </div>
     </div>
   `).join('');
 
-  const more = dim.issues.length > 5 ? `<div style="font-size:var(--font-size-xs);color:var(--text-muted);padding:var(--space-2) 0">还有 ${dim.issues.length - 5} 项...</div>` : '';
+  const more = dim.issues.length > 5 ? `<div class="text-xs text-muted" style="padding:var(--space-2) 0">还有 ${dim.issues.length - 5} 项...</div>` : '';
 
   let queryExtra = '';
   if (dim.queryAnalysis) {
@@ -186,12 +186,12 @@ function renderDimensionCard(dimId, dim) {
       const ml = verdict.matchScore >= 70 ? '高' : verdict.matchScore >= 40 ? '中' : '低';
       const mc = verdict.matchScore >= 70 ? 'var(--accent-green)' : verdict.matchScore >= 40 ? 'var(--accent-gold)' : 'var(--accent-red)';
       queryExtra = `
-        <div style="background:rgba(77,159,255,0.05);padding:var(--space-3);border-radius:8px;border:1px solid rgba(77,159,255,0.15);margin-top:var(--space-3)">
-          <div style="font-size:var(--font-size-xs);font-weight:600;color:var(--accent-blue);margin-bottom:var(--space-2)">🎯 关键词匹配</div>
-          <div style="display:flex;gap:var(--space-4);flex-wrap:wrap">
-            <span style="font-size:var(--font-size-sm)">Intent: <strong>${esc(intent.label)}</strong></span>
-            <span style="font-size:var(--font-size-sm)">匹配度: <strong style="color:${mc}">${ml}</strong></span>
-            <span style="font-size:var(--font-size-sm)">判定: <strong>${esc(verdict.title)}</strong></span>
+        <div class="mt-3" style="background:rgba(77,159,255,0.05); padding:var(--space-3); border-radius:8px; border:1px solid rgba(77,159,255,0.15)">
+          <div class="text-xs font-semibold text-accent-blue mb-2">🎯 关键词匹配</div>
+          <div class="gap-4" style="display:flex; flex-wrap:wrap">
+            <span class="text-sm">Intent: <strong>${esc(intent.label)}</strong></span>
+            <span class="text-sm">匹配度: <strong style="color:${mc}">${ml}</strong></span>
+            <span class="text-sm">判定: <strong>${esc(verdict.title)}</strong></span>
           </div>
         </div>
       `;
@@ -200,20 +200,20 @@ function renderDimensionCard(dimId, dim) {
 
   return `
     <div class="glass-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3)">
-        <div style="display:flex;align-items:center;gap:var(--space-2)">
+      <div class="flex justify-between mb-3" style="align-items:center">
+        <div class="flex items-center gap-2">
           <span style="font-size:var(--font-size-xl)">${dim.icon}</span>
-          <h3 style="font-size:var(--font-size-base);font-weight:700;margin:0">${esc(dim.label)}</h3>
+          <h3 class="text-base font-bold m-0">${esc(dim.label)}</h3>
         </div>
-        <div style="display:flex;align-items:center;gap:var(--space-3)">
-          ${dim.issueCount > 0 ? `<span class="badge" style="background:var(--accent-red)22;color:var(--accent-red)">${dim.issueCount} 问题</span>` : ''}
-          ${dim.passCount > 0 ? `<span class="badge" style="background:var(--accent-green)22;color:var(--accent-green)">${dim.passCount} 通过</span>` : ''}
-          <span style="font-size:var(--font-size-lg);font-weight:800;color:${clr}">${level}</span>
+        <div class="flex items-center gap-3">
+          ${dim.issueCount > 0 ? `<span class="badge text-accent-red" style="background:var(--accent-red)22">${dim.issueCount} 问题</span>` : ''}
+          ${dim.passCount > 0 ? `<span class="badge text-accent-green" style="background:var(--accent-green)22">${dim.passCount} 通过</span>` : ''}
+          <span class="text-lg font-extrabold" style="color:${clr}">${level}</span>
         </div>
       </div>
-      ${dim.issueCount > 0 ? `<div style="background:rgba(0,0,0,0.15);padding:var(--space-3);border-radius:8px">${issuesHtml}${more}</div>` : `<div style="text-align:center;padding:var(--space-3);color:var(--accent-green);font-size:var(--font-size-sm)">✅ 全部通过</div>`}
+      ${dim.issueCount > 0 ? `<div style="background:rgba(0,0,0,0.15);padding:var(--space-3);border-radius:8px">${issuesHtml}${more}</div>` : `<div class="text-center text-accent-green text-sm" style="padding:var(--space-3)">✅ 全部通过</div>`}
       ${queryExtra}
-      ${dim.passCount > 0 && dim.issueCount > 0 ? `<details style="margin-top:var(--space-3);cursor:pointer"><summary style="font-size:var(--font-size-xs);color:var(--text-muted)">查看 ${dim.passCount} 项通过项</summary><div style="padding:var(--space-2) 0;font-size:var(--font-size-xs);color:var(--text-muted)">${dim.passes.map(p => `<div style="padding:2px 0">✅ ${esc(p.finding)}</div>`).join('')}</div></details>` : ''}
+      ${dim.passCount > 0 && dim.issueCount > 0 ? `<details class="mt-3 cursor-pointer"><summary class="text-xs text-muted">查看 ${dim.passCount} 项通过项</summary><div class="text-xs text-muted" style="padding:var(--space-2) 0">${dim.passes.map(p => `<div style="padding:2px 0">✅ ${esc(p.finding)}</div>`).join('')}</div></details>` : ''}
     </div>
   `;
 }
@@ -227,20 +227,20 @@ function renderCompetitiveCard(dim) {
 
   const rankingHtml = cs ? cs.ranking.map((r, i) => {
     const bc = r.probability >= 50 ? 'var(--accent-green)' : r.probability >= 25 ? 'var(--accent-gold)' : 'var(--accent-red)';
-    return `<div style="display:flex;align-items:center;gap:var(--space-2);padding:4px 0"><span style="font-size:var(--font-size-xs);font-weight:700;width:20px;color:${i === 0 ? 'var(--accent-green)' : 'var(--text-muted)'}">#${i+1}</span><div style="flex:1;font-size:var(--font-size-xs);font-weight:${r.isMe?'700':'400'};color:${r.isMe?'var(--accent-green)':'var(--text-primary)'}">${r.isMe?'🏠 ':''}${esc(safeHost(r.url))}</div><div style="width:60px;height:4px;background:var(--bg-tertiary);border-radius:2px;overflow:hidden"><div style="height:100%;width:${r.probability}%;background:${bc};border-radius:2px"></div></div><span style="font-size:var(--font-size-xs);font-weight:700;color:${bc};width:32px;text-align:right">${r.probability}%</span></div>`;
+    return `<div class="flex items-center gap-2" style="padding:4px 0"><span class="text-xs font-bold" style="width:20px; color:${i === 0 ? 'var(--accent-green)' : 'var(--text-muted)'}">#${i+1}</span><div class="text-xs" style="flex:1; font-weight:${r.isMe?'700':'400'}; color:${r.isMe?'var(--accent-green)':'var(--text-primary)'}">${r.isMe?'🏠 ':''}${esc(safeHost(r.url))}</div><div style="width:60px;height:4px;background:var(--bg-tertiary);border-radius:2px;overflow:hidden"><div style="height:100%;width:${r.probability}%;background:${bc};border-radius:2px"></div></div><span class="text-xs font-bold text-right" style="color:${bc}; width:32px">${r.probability}%</span></div>`;
   }).join('') : '';
 
   return `
     <div class="glass-card" style="border-color:rgba(255,159,67,0.2)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3)">
-        <div style="display:flex;align-items:center;gap:var(--space-2)"><span style="font-size:var(--font-size-xl)">⚔️</span><h3 style="font-size:var(--font-size-base);font-weight:700;margin:0">竞品对标</h3></div>
-        ${gaps.length > 0 ? `<span class="badge" style="background:var(--accent-red)22;color:var(--accent-red)">${gaps.length} 差距</span>` : ''}
+      <div class="flex justify-between mb-3" style="align-items:center">
+        <div class="flex items-center gap-2"><span style="font-size:var(--font-size-xl)">⚔️</span><h3 class="text-base font-bold m-0">竞品对标</h3></div>
+        ${gaps.length > 0 ? `<span class="badge text-accent-red" style="background:var(--accent-red)22">${gaps.length} 差距</span>` : ''}
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
-        ${cs ? `<div style="background:rgba(0,0,0,0.15);padding:var(--space-3);border-radius:8px"><div style="font-size:var(--font-size-xs);color:var(--text-muted);margin-bottom:var(--space-2)">AI 引用概率排名</div>${rankingHtml}</div>` : ''}
-        ${ig ? `<div style="background:rgba(0,0,0,0.15);padding:var(--space-3);border-radius:8px"><div style="font-size:var(--font-size-xs);color:var(--text-muted);margin-bottom:var(--space-2)">信息增益</div><div style="font-size:var(--font-size-base);font-weight:700;color:${ig.igColor};margin-bottom:var(--space-2)">${esc(ig.igLabel)}</div><div style="font-size:var(--font-size-xs);color:var(--text-muted)">原创: ${ig.hasOriginalContent?'✅':'❌'} · 可引用: ${ig.hasCitableValue?'✅':'❌'}</div></div>` : ''}
+      <div class="grid gap-4" style="grid-template-columns:1fr 1fr">
+        ${cs ? `<div style="background:rgba(0,0,0,0.15);padding:var(--space-3);border-radius:8px"><div class="text-xs text-muted mb-2">AI 引用概率排名</div>${rankingHtml}</div>` : ''}
+        ${ig ? `<div style="background:rgba(0,0,0,0.15);padding:var(--space-3);border-radius:8px"><div class="text-xs text-muted mb-2">信息增益</div><div class="text-base font-bold mb-2" style="color:${ig.igColor}">${esc(ig.igLabel)}</div><div class="text-xs text-muted">原创: ${ig.hasOriginalContent?'✅':'❌'} · 可引用: ${ig.hasCitableValue?'✅':'❌'}</div></div>` : ''}
       </div>
-      ${gaps.length > 0 ? `<details style="margin-top:var(--space-3);cursor:pointer"><summary style="font-size:var(--font-size-xs);color:var(--accent-orange);font-weight:600">查看 ${gaps.length} 个差距</summary><div style="background:rgba(0,0,0,0.1);padding:var(--space-2);border-radius:6px;margin-top:var(--space-2)">${gaps.map(g => `<div style="font-size:var(--font-size-xs);padding:2px 0">${g.severity==='critical'?'🔴':g.severity==='warning'?'🟡':'🔵'} ${esc(g.label)}</div>`).join('')}</div></details>` : ''}
+      ${gaps.length > 0 ? `<details class="mt-3 cursor-pointer"><summary class="text-xs text-accent-orange font-semibold">查看 ${gaps.length} 个差距</summary><div class="mt-2" style="background:rgba(0,0,0,0.1); padding:var(--space-2); border-radius:6px">${gaps.map(g => `<div class="text-xs" style="padding:2px 0">${g.severity==='critical'?'🔴':g.severity==='warning'?'🟡':'🔵'} ${esc(g.label)}</div>`).join('')}</div></details>` : ''}
     </div>
   `;
 }
@@ -252,12 +252,12 @@ function renderCompetitiveCard(dim) {
 function renderActionsLayer(actions) {
   const { strategies, top5, counts, total } = actions;
   if (total === 0) {
-    return `<div class="glass-card" style="border-color:var(--accent-green);text-align:center;padding:var(--space-8)"><div style="font-size:var(--font-size-4xl);margin-bottom:var(--space-3)">🎉</div><h2 style="font-size:var(--font-size-lg);font-weight:700;color:var(--accent-green)">无需优化操作</h2></div>`;
+    return `<div class="glass-card text-center" style="border-color:var(--accent-green); padding:var(--space-8)"><div class="mb-3" style="font-size:var(--font-size-4xl)">🎉</div><h2 class="text-lg font-bold text-accent-green">无需优化操作</h2></div>`;
   }
 
   const top5Html = top5.map(item => {
     const m = EXEC_PRIORITY_META[item.execPriority] || EXEC_PRIORITY_META.P2;
-    return `<div style="display:flex;gap:var(--space-3);padding:var(--space-2) 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font-size:var(--font-size-base);font-weight:800;color:var(--text-muted);width:20px">${item.rank}</span><div style="flex:1"><div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:2px"><span class="badge" style="background:${m.color}22;color:${m.color};font-size:10px;padding:1px 6px">${item.execPriority}</span><span style="font-size:var(--font-size-sm);font-weight:600">${esc(item.title)}</span></div>${item.importance ? `<div style="font-size:var(--font-size-xs);color:var(--text-muted)">${esc(item.importance)}</div>` : ''}</div></div>`;
+    return `<div class="gap-3" style="display:flex; padding:var(--space-2) 0; border-bottom:1px solid rgba(255,255,255,0.05)"><span class="text-base font-extrabold text-muted" style="width:20px">${item.rank}</span><div style="flex:1"><div class="flex items-center gap-2" style="margin-bottom:2px"><span class="badge text-[10px]" style="background:${m.color}22; color:${m.color}; padding:1px 6px">${item.execPriority}</span><span class="text-sm font-semibold">${esc(item.title)}</span></div>${item.importance ? `<div class="text-xs text-muted">${esc(item.importance)}</div>` : ''}</div></div>`;
   }).join('');
 
   const top5Copy = top5.map(i => `${i.rank}. [${i.execPriority}] ${i.title}`).join('\n');
@@ -268,25 +268,25 @@ function renderActionsLayer(actions) {
     const epm = EXEC_PRIORITY_META[ep] || EXEC_PRIORITY_META.P2;
     const bc = ep === 'P0' ? 'var(--accent-red)' : ep === 'P1' ? 'var(--accent-orange)' : 'var(--accent-gold)';
     return `
-      <div class="glass-card strategy-card" style="margin-bottom:var(--space-3);border-left:3px solid ${bc};${hidden?'display:none':''}" ${hidden?'data-hidden-strategy':''}>
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-2)">
-          <div style="display:flex;gap:var(--space-2);flex-wrap:wrap">
+      <div class="glass-card strategy-card mb-3" style="border-left:3px solid ${bc}; ${hidden?'display:none':''}" ${hidden?'data-hidden-strategy':''}>
+        <div class="flex justify-between mb-2" style="align-items:flex-start">
+          <div class="gap-2" style="display:flex; flex-wrap:wrap">
             <span class="badge" style="background:${epm.color}22;color:${epm.color}">${epm.label}</span>
             ${s.category ? `<span class="badge badge-info">${getCategoryLabel(s.category).icon} ${esc(getCategoryLabel(s.category).label)}</span>` : ''}
           </div>
           <div style="display:flex;gap:4px">
             ${s.aiPrompt ? `
-              <button class="btn btn-secondary llm-gen-btn" data-prompt="${esc(s.aiPrompt)}" data-id="llm-out-${i}" style="font-size:var(--font-size-xs);padding:2px 8px;background:var(--accent-blue);color:white;border:none;">✨ AI 自动生成</button>
-              <button class="btn btn-ghost" style="font-size:var(--font-size-xs)" onclick="navigator.clipboard.writeText(this.dataset.text);this.textContent='已复制!';setTimeout(()=>this.textContent='📋 Prompt',2000)" data-text="${esc(s.aiPrompt)}">📋 Prompt</button>
+              <button class="btn btn-secondary llm-gen-btn text-xs" data-prompt="${esc(s.aiPrompt)}" data-id="llm-out-${i}" style="padding:2px 8px; background:var(--accent-blue); color:white; border:none">✨ AI 自动生成</button>
+              <button class="btn btn-ghost text-xs" onclick="navigator.clipboard.writeText(this.dataset.text);this.textContent='已复制!';setTimeout(()=>this.textContent='📋 Prompt',2000)" data-text="${esc(s.aiPrompt)}">📋 Prompt</button>
             ` : ''}
-            <button class="btn btn-ghost" style="font-size:var(--font-size-xs)" onclick="navigator.clipboard.writeText(this.dataset.text);this.textContent='已复制!';setTimeout(()=>this.textContent='📋 动作',2000)" data-text="${esc(s.action || s.title)}">📋 动作</button>
+            <button class="btn btn-ghost text-xs" onclick="navigator.clipboard.writeText(this.dataset.text);this.textContent='已复制!';setTimeout(()=>this.textContent='📋 动作',2000)" data-text="${esc(s.action || s.title)}">📋 动作</button>
           </div>
         </div>
-        ${s.aiPrompt ? `<div id="llm-out-${i}" class="llm-output-container" style="display:none;margin-bottom:var(--space-2);padding:var(--space-3);background:rgba(0,0,0,0.3);border:1px solid rgba(77,159,255,0.2);border-radius:6px;font-size:13px;line-height:1.6;color:var(--text-primary);white-space:pre-wrap;box-shadow:inset 0 2px 10px rgba(0,0,0,0.2);"></div>` : ''}
-        <h4 style="font-size:var(--font-size-sm);font-weight:700;margin-bottom:var(--space-2)">${esc(s.title)}</h4>
-        ${s.importance && s.riskOfNotDoing && s.benefitOfDoing ? `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-2);margin-bottom:var(--space-2)"><div style="background:rgba(0,0,0,0.12);padding:6px;border-radius:4px"><div style="font-size:9px;color:var(--text-muted)">为什么重要</div><div style="font-size:var(--font-size-xs);color:var(--text-secondary)">${esc(s.importance)}</div></div><div style="background:rgba(255,77,106,0.04);padding:6px;border-radius:4px"><div style="font-size:9px;color:var(--accent-red)">不做的风险</div><div style="font-size:var(--font-size-xs);color:var(--text-secondary)">${esc(s.riskOfNotDoing)}</div></div><div style="background:rgba(0,255,136,0.04);padding:6px;border-radius:4px"><div style="font-size:9px;color:var(--accent-green)">做了的收益</div><div style="font-size:var(--font-size-xs);color:var(--text-secondary)">${esc(s.benefitOfDoing)}</div></div></div>` : ''}
-        ${s.action && s.action !== s.title ? `<div style="font-size:var(--font-size-xs);color:var(--text-primary);white-space:pre-line;margin-bottom:var(--space-2)">${esc(s.action)}</div>` : ''}
-        ${s.codeTemplate ? `<details style="cursor:pointer"><summary style="font-size:var(--font-size-xs);color:var(--accent-blue)">📝 代码模板</summary><div style="background:#1a1c23;border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:var(--space-2);margin-top:var(--space-1)"><pre style="margin:0;overflow-x:auto;font-size:var(--font-size-xs);color:#a5d6ff"><code>${esc(s.codeTemplate)}</code></pre></div></details>` : ''}
+        ${s.aiPrompt ? `<div id="llm-out-${i}" class="llm-output-container mb-2 text-[13px] text-primary" style="display:none; padding:var(--space-3); background:rgba(0,0,0,0.3); border:1px solid rgba(77,159,255,0.2); border-radius:6px; line-height:1.6; white-space:pre-wrap; box-shadow:inset 0 2px 10px rgba(0,0,0,0.2)"></div>` : ''}
+        <h4 class="text-sm font-bold mb-2">${esc(s.title)}</h4>
+        ${s.importance && s.riskOfNotDoing && s.benefitOfDoing ? `<div class="grid gap-2 mb-2" style="grid-template-columns:repeat(3,1fr)"><div style="background:rgba(0,0,0,0.12);padding:6px;border-radius:4px"><div class="text-muted" style="font-size:9px">为什么重要</div><div class="text-xs text-secondary">${esc(s.importance)}</div></div><div style="background:rgba(255,77,106,0.04);padding:6px;border-radius:4px"><div class="text-accent-red" style="font-size:9px">不做的风险</div><div class="text-xs text-secondary">${esc(s.riskOfNotDoing)}</div></div><div style="background:rgba(0,255,136,0.04);padding:6px;border-radius:4px"><div class="text-accent-green" style="font-size:9px">做了的收益</div><div class="text-xs text-secondary">${esc(s.benefitOfDoing)}</div></div></div>` : ''}
+        ${s.action && s.action !== s.title ? `<div class="text-xs text-primary mb-2" style="white-space:pre-line">${esc(s.action)}</div>` : ''}
+        ${s.codeTemplate ? `<details class="cursor-pointer"><summary class="text-xs text-accent-blue">📝 代码模板</summary><div class="mt-1" style="background:#1a1c23; border:1px solid rgba(255,255,255,0.1); border-radius:4px; padding:var(--space-2)"><pre class="m-0 text-xs" style="overflow-x:auto; color:#a5d6ff"><code>${esc(s.codeTemplate)}</code></pre></div></details>` : ''}
       </div>
     `;
   }).join('');
@@ -295,26 +295,26 @@ function renderActionsLayer(actions) {
 
   return `
     <div>
-      <div class="glass-card animate-slide-up" style="margin-bottom:var(--space-5);border-color:var(--accent-green)33">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3)">
-          <div><h2 style="font-size:var(--font-size-lg);font-weight:700;margin:0">👉 Top 5 必做事项</h2><div style="font-size:var(--font-size-xs);color:var(--text-muted)">已做取舍，只保留最关键的</div></div>
-          <div style="display:flex;gap:var(--space-2)">
-            ${counts.p0 > 0 ? `<span class="badge" style="background:var(--accent-red)22;color:var(--accent-red)">P0 ×${counts.p0}</span>` : ''}
-            ${counts.p1 > 0 ? `<span class="badge" style="background:var(--accent-orange)22;color:var(--accent-orange)">P1 ×${counts.p1}</span>` : ''}
+      <div class="glass-card animate-slide-up mb-5" style="border-color:var(--accent-green)33">
+        <div class="flex justify-between mb-3" style="align-items:center">
+          <div><h2 class="text-lg font-bold m-0">👉 Top 5 必做事项</h2><div class="text-xs text-muted">已做取舍，只保留最关键的</div></div>
+          <div class="gap-2" style="display:flex">
+            ${counts.p0 > 0 ? `<span class="badge text-accent-red" style="background:var(--accent-red)22">P0 ×${counts.p0}</span>` : ''}
+            ${counts.p1 > 0 ? `<span class="badge text-accent-orange" style="background:var(--accent-orange)22">P1 ×${counts.p1}</span>` : ''}
             ${counts.p2 > 0 ? `<span class="badge" style="background:var(--accent-gold)22;color:var(--accent-gold)">P2 ×${counts.p2}</span>` : ''}
           </div>
         </div>
-        <div style="background:rgba(0,0,0,0.15);padding:var(--space-3);border-radius:8px;margin-bottom:var(--space-3)">${top5Html}</div>
-        <button class="btn btn-ghost" style="font-size:var(--font-size-xs);width:100%" onclick="navigator.clipboard.writeText(this.dataset.text);this.textContent='已复制! ✅';setTimeout(()=>this.textContent='📋 复制 Top 5 清单',2000)" data-text="${esc(top5Copy)}">📋 复制 Top 5 清单</button>
+        <div class="mb-3" style="background:rgba(0,0,0,0.15); padding:var(--space-3); border-radius:8px">${top5Html}</div>
+        <button class="btn btn-ghost text-xs w-full" onclick="navigator.clipboard.writeText(this.dataset.text);this.textContent='已复制! ✅';setTimeout(()=>this.textContent='📋 复制 Top 5 清单',2000)" data-text="${esc(top5Copy)}">📋 复制 Top 5 清单</button>
       </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4)">
-        <div style="display:flex;align-items:center;gap:var(--space-2)">
-          <h3 style="font-size:var(--font-size-base);font-weight:700;margin:0">全部优化操作</h3>
+      <div class="flex justify-between mb-4" style="align-items:center">
+        <div class="flex items-center gap-2">
+          <h3 class="text-base font-bold m-0">全部优化操作</h3>
           <span class="badge badge-info">${total} 条</span>
         </div>
       </div>
       ${cardsHtml}
-      ${hasMore ? `<div style="text-align:center;margin-top:var(--space-3)"><button class="btn btn-secondary" id="expand-all-strategies">📂 查看全部 ${total} 条 (已显示 ${MAX_VISIBLE_STRATEGIES} 条)</button></div>` : ''}
+      ${hasMore ? `<div class="text-center mt-3"><button class="btn btn-secondary" id="expand-all-strategies">📂 查看全部 ${total} 条 (已显示 ${MAX_VISIBLE_STRATEGIES} 条)</button></div>` : ''}
     </div>
   `;
 }
@@ -329,29 +329,29 @@ function renderLlmModal() {
   return `
     <div id="llm-config-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;">
       <div class="glass-card" style="width:400px;background:#1a1c23;border-color:var(--accent-blue);box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-        <h3 style="margin-top:0;margin-bottom:var(--space-3);color:var(--text-primary);display:flex;align-items:center;justify-content:space-between;">
+        <h3 class="mb-3 text-primary flex items-center" style="margin-top:0; justify-content:space-between">
           <span>⚙️ LLM 设置</span>
         </h3>
-        <p style="font-size:var(--font-size-xs);color:var(--text-muted);margin-bottom:var(--space-4);line-height:1.4;">
+        <p class="text-xs text-muted mb-4" style="line-height:1.4">
           配置兼容 OpenAI 格式的大模型 API，以启用页面自动生成功能。您的密钥安全保存在本地。
         </p>
         
-        <div style="margin-bottom:var(--space-3)">
-          <label style="display:block;font-size:12px;margin-bottom:4px;color:var(--text-secondary);">Base URL <span style="color:var(--accent-red)">*</span></label>
-          <input type="text" id="llm-base-url" value="${esc(config.baseUrl)}" placeholder="https://api.openai.com/v1" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);color:var(--text-primary);padding:8px 12px;border-radius:4px;font-size:14px;" />
+        <div class="mb-3">
+          <label class="text-xs text-secondary" style="display:block; margin-bottom:4px">Base URL <span class="text-accent-red">*</span></label>
+          <input type="text" id="llm-base-url" value="${esc(config.baseUrl)}" placeholder="https://api.openai.com/v1" class="w-full text-primary" style="box-sizing:border-box; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); padding:8px 12px; border-radius:4px; font-size:14px" />
         </div>
         
-        <div style="margin-bottom:var(--space-3)">
-          <label style="display:block;font-size:12px;margin-bottom:4px;color:var(--text-secondary);">API Key <span style="color:var(--accent-red)">*</span></label>
-          <input type="password" id="llm-api-key" value="${esc(config.apiKey)}" placeholder="sk-..." style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);color:var(--text-primary);padding:8px 12px;border-radius:4px;font-size:14px;" />
+        <div class="mb-3">
+          <label class="text-xs text-secondary" style="display:block; margin-bottom:4px">API Key <span class="text-accent-red">*</span></label>
+          <input type="password" id="llm-api-key" value="${esc(config.apiKey)}" placeholder="sk-..." class="w-full text-primary" style="box-sizing:border-box; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); padding:8px 12px; border-radius:4px; font-size:14px" />
         </div>
         
-        <div style="margin-bottom:var(--space-4)">
-          <label style="display:block;font-size:12px;margin-bottom:4px;color:var(--text-secondary);">模型名称 (Model) <span style="color:var(--accent-red)">*</span></label>
-          <input type="text" id="llm-model" value="${esc(config.model)}" placeholder="gpt-4o-mini" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);color:var(--text-primary);padding:8px 12px;border-radius:4px;font-size:14px;" />
+        <div class="mb-4">
+          <label class="text-xs text-secondary" style="display:block; margin-bottom:4px">模型名称 (Model) <span class="text-accent-red">*</span></label>
+          <input type="text" id="llm-model" value="${esc(config.model)}" placeholder="gpt-4o-mini" class="w-full text-primary" style="box-sizing:border-box; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); padding:8px 12px; border-radius:4px; font-size:14px" />
         </div>
         
-        <div style="display:flex;justify-content:flex-end;gap:var(--space-2);">
+        <div class="flex justify-end gap-2">
           <button id="llm-cancel-btn" class="btn btn-ghost">取消</button>
           <button id="llm-save-btn" class="btn" style="background:var(--accent-blue);color:#fff;border:none;">保存配置</button>
         </div>
@@ -417,7 +417,7 @@ export function initUnifiedResults(container) {
       if (!outContainer) return;
       
       outContainer.style.display = 'block';
-      outContainer.innerHTML = '<span style="color:var(--text-muted);">正在呼叫 AI 加载配置，准备开始生成... ⏳</span>';
+      outContainer.innerHTML = '<span class="text-muted">正在呼叫 AI 加载配置，准备开始生成... ⏳</span>';
       e.target.disabled = true;
       const originalText = e.target.textContent;
       e.target.textContent = '生成中... 🌊';
@@ -436,7 +436,7 @@ export function initUnifiedResults(container) {
         e.target.textContent = '✅ 生成完成';
       } catch (err) {
         let errMsg = err.message || String(err);
-        outContainer.innerHTML = `<span style="color:var(--accent-red)">⚠️ 生成出错: ${esc(errMsg)}</span>`;
+        outContainer.innerHTML = `<span class="text-accent-red">⚠️ 生成出错: ${esc(errMsg)}</span>`;
         e.target.textContent = '🔁 重试生成';
         e.target.disabled = false;
         
@@ -461,38 +461,38 @@ function formatChunkToHtml(chunk) {
 // ============================================================
 
 function lenBadge(val, maxLen) {
-  if (!val) return `<span style="font-size:10px;background:rgba(239,68,68,0.15);color:var(--accent-red);padding:1px 7px;border-radius:10px">缺失</span>`;
+  if (!val) return `<span class="text-[10px] text-accent-red" style="background:rgba(239,68,68,0.15); padding:1px 7px; border-radius:10px">缺失</span>`;
   const len = val.length;
   const ok  = len <= maxLen && len >= Math.round(maxLen * 0.45);
   const clr = ok ? 'var(--accent-green)' : len > maxLen ? 'var(--accent-red)' : 'var(--accent-gold)';
   const icon = ok ? '✅' : len > maxLen ? '超长' : '偏短';
-  return `<span style="font-size:10px;background:${clr}22;color:${clr};padding:1px 7px;border-radius:10px">${len}字符 ${icon}</span>`;
+  return `<span class="text-[10px]" style="background:${clr}22; color:${clr}; padding:1px 7px; border-radius:10px">${len}字符 ${icon}</span>`;
 }
 
 // Short field (Title / Meta Desc / H1): side-by-side columns
 function rwCompareShort(id, icon, label, currentVal, maxLen, promptAttr) {
   const escapedCurrent = currentVal ? esc(currentVal) : '';
   return `
-    <div class="rw-field-block" data-rw-id="${id}" style="margin-bottom:var(--space-4)">
-      <div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:var(--space-2);display:flex;align-items:center;gap:6px">
+    <div class="rw-field-block mb-4" data-rw-id="${id}">
+      <div class="text-[11px] font-bold text-secondary mb-2 flex items-center" style="gap:6px">
         <span>${icon}</span><span>${label}</span>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2)">
+      <div class="grid gap-2" style="grid-template-columns:1fr 1fr">
         <!-- Original -->
         <div>
-          <div style="font-size:9px;color:var(--text-muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.6px;display:flex;align-items:center;gap:6px">
+          <div class="text-muted flex items-center" style="font-size:9px; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.6px; gap:6px">
             当前版本 ${lenBadge(currentVal, maxLen)}
           </div>
-          <div style="padding:9px 11px;min-height:46px;background:rgba(0,0,0,0.18);border:1px solid rgba(255,255,255,0.07);border-radius:5px;font-size:12px;color:var(--text-muted);line-height:1.5;word-break:break-word">
+          <div class="text-xs text-muted" style="padding:9px 11px; min-height:46px; background:rgba(0,0,0,0.18); border:1px solid rgba(255,255,255,0.07); border-radius:5px; line-height:1.5; word-break:break-word">
             ${escapedCurrent || '<span style="font-style:italic;opacity:0.4">（缺失）</span>'}
           </div>
         </div>
         <!-- AI Optimized -->
         <div>
-          <div style="font-size:9px;color:var(--accent-green);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.6px;display:flex;align-items:center;justify-content:space-between">
+          <div class="text-accent-green flex items-center" style="font-size:9px; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.6px; justify-content:space-between">
             <span>AI 优化版 <span id="${id}-ai-badge"></span></span>
-            <button class="rw-regen-btn" data-target="${id}-ta" data-prompt="${promptAttr}"
-              style="font-size:9px;padding:1px 8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:3px;color:var(--text-muted);cursor:pointer">
+            <button class="rw-regen-btn text-muted cursor-pointer" data-target="${id}-ta" data-prompt="${promptAttr}"
+              style="font-size:9px; padding:1px 8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:3px">
               🔁 重新生成
             </button>
           </div>
@@ -511,8 +511,8 @@ function rwCompareShort(id, icon, label, currentVal, maxLen, promptAttr) {
 // Long field (Intro / FAQ): stacked rows
 function rwCompareLong(id, icon, label, promptAttr, rows = 5, previewMaxLen = 180) {
   return `
-    <div class="rw-field-block" data-rw-id="${id}" style="margin-bottom:var(--space-4)">
-      <div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:var(--space-2);display:flex;align-items:center;gap:6px">
+    <div class="rw-field-block mb-4" data-rw-id="${id}">
+      <div class="text-[11px] font-bold text-secondary mb-2 flex items-center" style="gap:6px">
         <span>${icon}</span><span>${label}</span>
         <button class="rw-regen-btn" data-target="${id}-ta" data-prompt="${promptAttr}"
           style="margin-left:auto;font-size:9px;padding:1px 8px;background:rgba(255,255,255,0.05);
@@ -521,7 +521,7 @@ function rwCompareLong(id, icon, label, promptAttr, rows = 5, previewMaxLen = 18
         </button>
       </div>
       <!-- AI output (main) -->
-      <div style="font-size:9px;color:var(--accent-green);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px">AI 生成版 <span id="${id}-ai-badge"></span></div>
+      <div class="text-accent-green" style="font-size:9px; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.6px">AI 生成版 <span id="${id}-ai-badge"></span></div>
       <textarea id="${id}-ta" rows="${rows}"
         style="width:100%;box-sizing:border-box;background:rgba(34,197,94,0.05);
           border:1px solid rgba(34,197,94,0.2);color:var(--text-primary);
@@ -654,22 +654,22 @@ function renderPageRewriteStudio(result) {
     <div style="margin-top:var(--space-8)" id="rw-studio-root">
 
       <!-- Studio Header -->
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-4);flex-wrap:wrap;gap:var(--space-3)">
+      <div class="flex justify-between mb-4 gap-3" style="align-items:flex-start; flex-wrap:wrap">
         <div>
-          <h2 style="margin:0;font-size:var(--font-size-lg);font-weight:800">📝 页面重写工作台</h2>
-          <div style="margin-top:4px;display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
-            <div id="rw-progress-bar" style="display:none;align-items:center;gap:var(--space-2)">
+          <h2 class="m-0 text-lg font-extrabold">📝 页面重写工作台</h2>
+          <div class="flex items-center gap-3" style="margin-top:4px; flex-wrap:wrap">
+            <div id="rw-progress-bar" class="gap-2" style="display:none; align-items:center">
               <div style="width:120px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden">
                 <div id="rw-progress-fill" style="height:100%;width:0%;background:var(--accent-green);border-radius:2px;transition:width 0.4s ease"></div>
               </div>
-              <span id="rw-progress-label" style="font-size:11px;color:var(--text-muted)">准备中...</span>
+              <span id="rw-progress-label" class="text-[11px] text-muted">准备中...</span>
             </div>
-            <span id="rw-done-msg" style="display:none;font-size:11px;color:var(--accent-green)">✅ 全部生成完成，右侧代码已同步</span>
+            <span id="rw-done-msg" class="text-[11px] text-accent-green" style="display:none">✅ 全部生成完成，右侧代码已同步</span>
           </div>
         </div>
-        <div style="display:flex;gap:var(--space-2)">
-          <button id="rw-ai-all-btn" class="btn"
-            style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;font-size:var(--font-size-xs);padding:8px 16px"
+        <div class="gap-2" style="display:flex">
+          <button id="rw-ai-all-btn" class="btn text-xs"
+            style="background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; padding:8px 16px"
             data-prompt="${esc(mkAll())}">
             🔁 重新全页优化
           </button>
@@ -677,13 +677,13 @@ function renderPageRewriteStudio(result) {
       </div>
 
       <!-- Two-column layout -->
-      <div id="rw-layout-grid" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--space-4);align-items:start;transition:all 0.3s">
+      <div id="rw-layout-grid" class="grid gap-4" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:start; transition:all 0.3s">
 
         <!-- ── LEFT: Before / After Fields ── -->
         <div>
 
           <!-- HEAD 标签 -->
-          <div class="glass-card" style="margin-bottom:var(--space-4)">
+          <div class="glass-card mb-4">
             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
               color:var(--text-muted);margin-bottom:var(--space-3);padding-bottom:var(--space-2);
               border-bottom:1px solid var(--border-default)">🔖 HEAD 标签</div>
@@ -692,7 +692,7 @@ function renderPageRewriteStudio(result) {
           </div>
 
           <!-- 页面结构 -->
-          <div class="glass-card" style="margin-bottom:var(--space-4)">
+          <div class="glass-card mb-4">
             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
               color:var(--text-muted);margin-bottom:var(--space-3);padding-bottom:var(--space-2);
               border-bottom:1px solid var(--border-default)">🏗️ 页面结构</div>
@@ -717,21 +717,21 @@ function renderPageRewriteStudio(result) {
             <div style="display:flex;justify-content:space-between;align-items:center;
               padding:var(--space-3) var(--space-4);background:rgba(0,0,0,0.25);
               border-bottom:1px solid var(--border-default)">
-              <div style="display:flex;align-items:center;gap:var(--space-2)">
+              <div class="flex items-center gap-2">
                 <span>💻</span>
-                <span style="font-size:var(--font-size-sm);font-weight:700">完整 HTML 代码（实时同步）</span>
+                <span class="text-sm font-bold">完整 HTML 代码（实时同步）</span>
               </div>
-              <button id="rw-copy-btn" class="btn btn-ghost" style="font-size:11px;padding:3px 10px">📋 复制全部</button>
+              <button id="rw-copy-btn" class="btn btn-ghost text-[11px]" style="padding:3px 10px">📋 复制全部</button>
             </div>
 
             <!-- Tabs -->
             <div style="display:flex;border-bottom:1px solid var(--border-default)">
-              <button class="rw-tab-btn" data-tab="head"
-                style="flex:1;padding:8px;font-size:11px;background:rgba(77,159,255,0.1);color:var(--accent-blue);border:none;cursor:pointer;font-weight:600">
+              <button class="rw-tab-btn text-[11px] text-accent-blue cursor-pointer font-semibold" data-tab="head"
+                style="flex:1; padding:8px; background:rgba(77,159,255,0.1); border:none">
                 &lt;head&gt; 标签
               </button>
-              <button class="rw-tab-btn" data-tab="body"
-                style="flex:1;padding:8px;font-size:11px;background:transparent;color:var(--text-muted);border:none;cursor:pointer">
+              <button class="rw-tab-btn text-[11px] text-muted cursor-pointer" data-tab="body"
+                style="flex:1; padding:8px; background:transparent; border:none">
                 &lt;body&gt; 结构
               </button>
             </div>
@@ -748,10 +748,10 @@ function renderPageRewriteStudio(result) {
             </div>
 
             <!-- Stats bar -->
-            <div style="padding:var(--space-2) var(--space-4);background:rgba(0,0,0,0.15);border-top:1px solid var(--border-default);font-size:10px;color:var(--text-muted);display:flex;gap:var(--space-4)">
-              <span>Title: <strong id="rw-stat-title" style="color:var(--text-primary)">0</strong>/60</span>
-              <span>Desc: <strong id="rw-stat-desc" style="color:var(--text-primary)">0</strong>/150</span>
-              <span>H1: <strong id="rw-stat-h1" style="color:var(--text-primary)">0</strong>/55</span>
+            <div class="text-[10px] text-muted gap-4" style="padding:var(--space-2) var(--space-4); background:rgba(0,0,0,0.15); border-top:1px solid var(--border-default); display:flex">
+              <span>Title: <strong id="rw-stat-title" class="text-primary">0</strong>/60</span>
+              <span>Desc: <strong id="rw-stat-desc" class="text-primary">0</strong>/150</span>
+              <span>H1: <strong id="rw-stat-h1" class="text-primary">0</strong>/55</span>
               <span style="margin-left:auto">← 左侧内容实时同步</span>
             </div>
           </div>
@@ -899,7 +899,7 @@ function initPageRewriteStudio(container) {
         fields[id] = buffer;
         refreshCode();
         ta.style.borderColor = 'rgba(255,255,255,0.1)';
-        if (badge) badge.innerHTML = `<span style="color:var(--text-muted);font-weight:normal;text-transform:none">（当前已最优，保留原版）</span>`;
+        if (badge) badge.innerHTML = `<span class="text-muted" style="font-weight:normal; text-transform:none">（当前已最优，保留原版）</span>`;
       } else {
         ta.style.borderColor = 'rgba(34,197,94,0.4)';
         if (badge) badge.innerText = '';

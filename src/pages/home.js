@@ -29,7 +29,7 @@ export function renderHomePage() {
       <!-- Unified Input / Tabs -->
       <section class="animate-slide-up" style="animation-delay:0.1s;max-width:720px;margin:0 auto var(--space-6)">
         
-        <div style="display:flex;gap:var(--space-2);margin-bottom:var(--space-4);justify-content:center;">
+        <div class="gap-2 mb-4 flex justify-center">
           <button id="tab-single" class="btn btn-secondary" style="border-radius:20px;padding:8px 24px;background:var(--accent-blue);color:white;border:none">📄 单页微观重写</button>
           <button id="tab-site" class="btn btn-ghost" style="border-radius:20px;padding:8px 24px;border:none">🕸️ 网站内链架构</button>
         </div>
@@ -37,47 +37,47 @@ export function renderHomePage() {
         <!-- Form 1: Single Page -->
         <div class="glass-card" id="form-single">
           <!-- URL (Required) -->
-          <div style="margin-bottom:var(--space-4)">
-            <label style="display:block;font-size:var(--font-size-xs);color:var(--accent-green);margin-bottom:var(--space-2);font-weight:600">
-              🔗 页面 URL <span style="color:var(--accent-red)">*</span>
+          <div class="mb-4">
+            <label class="text-xs text-accent-green mb-2 font-semibold" style="display:block">
+              🔗 页面 URL <span class="text-accent-red">*</span>
             </label>
-            <input type="url" id="input-url" placeholder="https://example.com/your-page" style="width:100%;font-size:var(--font-size-base)" />
+            <input type="url" id="input-url" placeholder="https://example.com/your-page" class="w-full text-base" />
           </div>
 
           <!-- Keyword (Optional) -->
-          <div style="margin-bottom:var(--space-4)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2)">
-              <label style="font-size:var(--font-size-xs);color:var(--accent-blue);font-weight:600">
-                🎯 目标关键词 <span style="color:var(--text-muted);font-weight:400">(选填 — 激活 Intent 分析)</span>
+          <div class="mb-4">
+            <div class="flex justify-between mb-2" style="align-items:center">
+              <label class="text-xs text-accent-blue font-semibold">
+                🎯 目标关键词 <span class="text-muted font-normal">(选填 — 激活 Intent 分析)</span>
               </label>
             </div>
-            <input type="text" id="input-keyword" placeholder="如: 国际汇款费用对比" style="width:100%" />
+            <input type="text" id="input-keyword" placeholder="如: 国际汇款费用对比" class="w-full" />
           </div>
 
           <!-- Competitors (Optional, collapsed by default) -->
-          <details id="competitor-section" style="margin-bottom:var(--space-4)">
-            <summary style="font-size:var(--font-size-xs);color:var(--accent-orange);font-weight:600;cursor:pointer;margin-bottom:var(--space-2)">
+          <details id="competitor-section" class="mb-4">
+            <summary class="text-xs text-accent-orange font-semibold cursor-pointer mb-2">
               ⚔️ 竞品 URL (选填 — 激活竞品对标 + 信息增益 + AI 引用排名)
             </summary>
             <!-- Presets -->
-            <div style="display:flex;gap:var(--space-2);margin-top:var(--space-2);margin-bottom:var(--space-2);flex-wrap:wrap">
-              <span style="font-size:11px;color:var(--text-muted);align-self:center">快速预设：</span>
-              <button class="btn btn-ghost preset-btn" data-preset="remittance" style="font-size:11px;padding:3px 10px">🌏 国际汇款</button>
-              <button class="btn btn-ghost preset-btn" data-preset="stock" style="font-size:11px;padding:3px 10px">📈 美港股券商</button>
-              <button class="btn btn-ghost preset-btn" data-preset="crypto" style="font-size:11px;padding:3px 10px">₿ 加密交易所</button>
+            <div class="gap-2 mt-2 mb-2" style="display:flex; flex-wrap:wrap">
+              <span class="text-[11px] text-muted" style="align-self:center">快速预设：</span>
+              <button class="btn btn-ghost preset-btn text-[11px]" data-preset="remittance" style="padding:3px 10px">🌏 国际汇款</button>
+              <button class="btn btn-ghost preset-btn text-[11px]" data-preset="stock" style="padding:3px 10px">📈 美港股券商</button>
+              <button class="btn btn-ghost preset-btn text-[11px]" data-preset="crypto" style="padding:3px 10px">₿ 加密交易所</button>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3);margin-top:var(--space-2)" class="competitor-inputs">
-              <input type="url" id="input-comp-1" placeholder="竞品 URL 1" style="width:100%" />
-              <input type="url" id="input-comp-2" placeholder="竞品 URL 2 (可选)" style="width:100%" />
-              <input type="url" id="input-comp-3" placeholder="竞品 URL 3 (可选)" style="width:100%" />
+            <div class="grid gap-3 mt-2" style="grid-template-columns:repeat(3,1fr)" class="competitor-inputs">
+              <input type="url" id="input-comp-1" placeholder="竞品 URL 1" class="w-full" />
+              <input type="url" id="input-comp-2" placeholder="竞品 URL 2 (可选)" class="w-full" />
+              <input type="url" id="input-comp-3" placeholder="竞品 URL 3 (可选)" class="w-full" />
             </div>
             <!-- Compare Mode Toggle -->
-            <div style="margin-top:var(--space-3);padding:var(--space-3);background:rgba(77,159,255,0.06);border:1px solid rgba(77,159,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:space-between;">
+            <div class="mt-3 flex items-center" style="padding:var(--space-3); background:rgba(77,159,255,0.06); border:1px solid rgba(77,159,255,0.15); border-radius:8px; justify-content:space-between">
               <div>
-                <div style="font-size:var(--font-size-xs);font-weight:600;color:var(--accent-blue)">⚔️ 并排对比模式</div>
-                <div style="font-size:11px;color:var(--text-muted);margin-top:2px">开启后输出并排对比矩阵，关闭则输出标准单页诊断</div>
+                <div class="text-xs font-semibold text-accent-blue">⚔️ 并排对比模式</div>
+                <div class="text-[11px] text-muted" style="margin-top:2px">开启后输出并排对比矩阵，关闭则输出标准单页诊断</div>
               </div>
-              <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;flex-shrink:0">
+              <label class="cursor-pointer shrink-0" style="position:relative; display:inline-block; width:44px; height:24px">
                 <input type="checkbox" id="toggle-compare" style="opacity:0;width:0;height:0" />
                 <span id="toggle-compare-track" style="position:absolute;inset:0;background:rgba(255,255,255,0.1);border-radius:12px;transition:background 0.3s"></span>
                 <span id="toggle-compare-thumb" style="position:absolute;left:3px;top:3px;width:18px;height:18px;background:white;border-radius:50%;transition:left 0.3s"></span>
@@ -86,7 +86,7 @@ export function renderHomePage() {
           </details>
 
           <!-- Submit -->
-          <div style="text-align:center;margin-bottom:var(--space-4)">
+          <div class="text-center mb-4">
             <button class="btn btn-primary btn-lg" id="btn-analyze" style="min-width:240px">
               🚀 开始分析
             </button>
@@ -94,85 +94,85 @@ export function renderHomePage() {
 
           <!-- LLM Config Bar (persistent) -->
           <details id="llm-config-bar" style="border-top:1px solid var(--border-default);padding-top:var(--space-3)">
-            <summary style="cursor:pointer;display:flex;align-items:center;gap:var(--space-2);list-style:none;user-select:none">
-              <span style="font-size:11px;color:var(--text-muted)">⚙️ AI 设置</span>
-              <span id="llm-status-badge" style="font-size:10px;padding:1px 7px;border-radius:10px;background:rgba(255,255,255,0.07);color:var(--text-muted)">检查中...</span>
-              <span style="margin-left:auto;font-size:10px;color:var(--text-muted)">(点展开配置)</span>
+            <summary class="cursor-pointer flex items-center gap-2" style="list-style:none; user-select:none">
+              <span class="text-[11px] text-muted">⚙️ AI 设置</span>
+              <span id="llm-status-badge" class="text-[10px] text-muted" style="padding:1px 7px; border-radius:10px; background:rgba(255,255,255,0.07)">检查中...</span>
+              <span class="text-[10px] text-muted" style="margin-left:auto">(点展开配置)</span>
             </summary>
 
             <!-- Provider quick presets -->
-            <div style="margin-top:var(--space-3);margin-bottom:var(--space-2)">
-              <div style="font-size:9px;color:var(--text-muted);margin-bottom:var(--space-2);text-transform:uppercase;letter-spacing:0.5px">一键选择服务商（浏览器可直调）</div>
-              <div style="display:flex;flex-wrap:wrap;gap:var(--space-2)" id="llm-provider-presets">
-                <button class="llm-preset-btn" data-baseurl="https://api.deepseek.com/v1" data-model="deepseek-chat"
-                  style="font-size:11px;padding:3px 12px;background:rgba(77,159,255,0.1);border:1px solid rgba(77,159,255,0.2);border-radius:4px;color:var(--accent-blue);cursor:pointer">
+            <div class="mt-3 mb-2">
+              <div class="text-muted mb-2" style="font-size:9px; text-transform:uppercase; letter-spacing:0.5px">一键选择服务商（浏览器可直调）</div>
+              <div class="gap-2" style="display:flex; flex-wrap:wrap" id="llm-provider-presets">
+                <button class="llm-preset-btn text-[11px] text-accent-blue cursor-pointer" data-baseurl="https://api.deepseek.com/v1" data-model="deepseek-chat"
+                  style="padding:3px 12px; background:rgba(77,159,255,0.1); border:1px solid rgba(77,159,255,0.2); border-radius:4px">
                   🔵 DeepSeek <span style="font-size:9px;opacity:0.6">推荐</span>
                 </button>
-                <button class="llm-preset-btn" data-baseurl="https://api.moonshot.cn/v1" data-model="moonshot-v1-8k"
-                  style="font-size:11px;padding:3px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:4px;color:var(--text-primary);cursor:pointer">
+                <button class="llm-preset-btn text-[11px] text-primary cursor-pointer" data-baseurl="https://api.moonshot.cn/v1" data-model="moonshot-v1-8k"
+                  style="padding:3px 12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:4px">
                   🌙 Kimi
                 </button>
-                <button class="llm-preset-btn" data-baseurl="https://dashscope.aliyuncs.com/compatible-mode/v1" data-model="qwen-plus"
-                  style="font-size:11px;padding:3px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:4px;color:var(--text-primary);cursor:pointer">
+                <button class="llm-preset-btn text-[11px] text-primary cursor-pointer" data-baseurl="https://dashscope.aliyuncs.com/compatible-mode/v1" data-model="qwen-plus"
+                  style="padding:3px 12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:4px">
                   ☁️ 阿里百炼
                 </button>
-                <button class="llm-preset-btn" data-baseurl="https://generativelanguage.googleapis.com/v1beta/openai" data-model="gemini-2.0-flash"
-                  style="font-size:11px;padding:3px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:4px;color:var(--text-primary);cursor:pointer">
+                <button class="llm-preset-btn text-[11px] text-primary cursor-pointer" data-baseurl="https://generativelanguage.googleapis.com/v1beta/openai" data-model="gemini-2.0-flash"
+                  style="padding:3px 12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:4px">
                   💎 Gemini
                 </button>
-                <button class="llm-preset-btn" data-baseurl="https://api.openai.com/v1" data-model="gpt-4o-mini"
-                  style="font-size:11px;padding:3px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:var(--text-muted);cursor:pointer">
+                <button class="llm-preset-btn text-[11px] text-muted cursor-pointer" data-baseurl="https://api.openai.com/v1" data-model="gpt-4o-mini"
+                  style="padding:3px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:4px">
                   🤖 OpenAI <span style="font-size:9px;opacity:0.5">需代理</span>
                 </button>
               </div>
             </div>
 
-            <div style="display:grid;grid-template-columns:3fr 1fr;gap:var(--space-2);align-items:end">
+            <div class="grid gap-2" style="grid-template-columns:3fr 1fr; align-items:end">
               <div>
-                <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">API Base URL</div>
+                <div class="text-[10px] text-muted" style="margin-bottom:4px">API Base URL</div>
                 <input type="text" id="llm-base-url"
-                  style="width:100%;font-size:12px;padding:6px 8px"
+                  class="w-full text-xs" style="padding:6px 8px"
                   placeholder="https://api.deepseek.com/v1" />
               </div>
               <div>
-                <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Model</div>
+                <div class="text-[10px] text-muted" style="margin-bottom:4px">Model</div>
                 <input type="text" id="llm-model"
-                  style="width:100%;font-size:12px;padding:6px 8px"
+                  class="w-full text-xs" style="padding:6px 8px"
                   placeholder="deepseek-chat" />
               </div>
             </div>
-            <div style="margin-top:var(--space-2);display:flex;align-items:center;justify-content:space-between">
-              <span style="font-size:10px;color:var(--text-muted)">API 鉴权现已由服务端统一安全接管（读取云端服务器中的专属配置），前端无需再填写 Key。</span>
-              <button id="llm-save-home" class="btn btn-secondary" style="font-size:11px;padding:4px 14px;flex-shrink:0">保存</button>
+            <div class="mt-2 flex items-center" style="justify-content:space-between">
+              <span class="text-[10px] text-muted">API 鉴权现已由服务端统一安全接管（读取云端服务器中的专属配置），前端无需再填写 Key。</span>
+              <button id="llm-save-home" class="btn btn-secondary text-[11px] shrink-0" style="padding:4px 14px">保存</button>
             </div>
           </details>
         </div>
 
         <!-- Form 2: Site Architecture -->
         <div class="glass-card" id="form-site" style="display:none">
-          <h3 style="margin-top:0;font-size:var(--font-size-lg)">🕸️ 全站 / 版块拓扑扫描</h3>
-          <p style="font-size:12px;color:var(--text-muted);margin-bottom:var(--space-4)">输入根目录让轻量化蜘蛛爬取上下级结构，或导入大型网站的 Screaming Frog CSV。</p>
+          <h3 class="text-lg" style="margin-top:0">🕸️ 全站 / 版块拓扑扫描</h3>
+          <p class="text-xs text-muted mb-4">输入根目录让轻量化蜘蛛爬取上下级结构，或导入大型网站的 Screaming Frog CSV。</p>
           
-          <div style="margin-bottom:var(--space-4)">
-            <label style="display:block;font-size:var(--font-size-xs);color:var(--accent-green);margin-bottom:var(--space-2);font-weight:600">
+          <div class="mb-4">
+            <label class="text-xs text-accent-green mb-2 font-semibold" style="display:block">
               🔗 版块 Root URL (前端轻量蛛蛛)
             </label>
-            <div style="display:flex;gap:var(--space-2)">
+            <div class="gap-2" style="display:flex">
               <input type="url" id="input-site-url" placeholder="https://example.com/blog/" style="flex:1" />
-              <button id="btn-spider" class="btn btn-primary" style="flex-shrink:0">🕸️ 织网爬取</button>
+              <button id="btn-spider" class="btn btn-primary shrink-0">🕸️ 织网爬取</button>
             </div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:4px">安全限制：单次并发上限 40 页面（防由于跨域及内存导致崩溃）</div>
+            <div class="text-[11px] text-muted" style="margin-top:4px">安全限制：单次并发上限 40 页面（防由于跨域及内存导致崩溃）</div>
           </div>
           
-          <div style="text-align:center;margin:var(--space-4) 0;color:var(--text-muted);font-size:11px">— 或者 —</div>
+          <div class="text-center text-muted text-[11px]" style="margin:var(--space-4) 0">— 或者 —</div>
           
-          <div style="margin-bottom:var(--space-2);padding:var(--space-4);border:1px dashed var(--border-default);border-radius:8px;text-align:center">
-            <div style="font-size:var(--font-size-lg);margin-bottom:var(--space-2)">📊</div>
-            <div style="font-size:13px;margin-bottom:var(--space-3)">上传 Screaming Frog 导出的 Internal HTML CSV / XLSX</div>
+          <div class="mb-2 text-center" style="padding:var(--space-4); border:1px dashed var(--border-default); border-radius:8px">
+            <div class="text-lg mb-2">📊</div>
+            <div class="text-[13px] mb-3">上传 Screaming Frog 导出的 Internal HTML CSV / XLSX</div>
             <input type="file" id="input-csv" accept=".csv,.xlsx,.xls" style="display:none" />
             <button id="btn-trigger-file" class="btn btn-secondary">选择 CSV / XLSX 文件</button>
-            <div id="csv-filename" style="font-size:11px;margin-top:8px;color:var(--accent-blue)"></div>
-            <div id="csv-preview" style="font-size:11px;margin-top:4px;color:var(--text-muted)"></div>
+            <div id="csv-filename" class="text-[11px] text-accent-blue" style="margin-top:8px"></div>
+            <div id="csv-preview" class="text-[11px] text-muted" style="margin-top:4px"></div>
           </div>
         </div>
 
@@ -338,7 +338,7 @@ export function renderHomePage() {
       // Validate URL
       try { new URL(url); } catch {
         resultsArea.style.display = 'block';
-        resultsArea.innerHTML = `<div class="glass-card" style="color:var(--accent-red)">❌ 无效 URL: ${esc(url)}</div>`;
+        resultsArea.innerHTML = `<div class="glass-card text-accent-red">❌ 无效 URL: ${esc(url)}</div>`;
         return;
       }
 
@@ -349,7 +349,7 @@ export function renderHomePage() {
       for (const cu of competitorUrls) {
         try { new URL(cu); } catch {
           resultsArea.style.display = 'block';
-          resultsArea.innerHTML = `<div class="glass-card" style="color:var(--accent-red)">❌ 无效竞品 URL: ${esc(cu)}</div>`;
+          resultsArea.innerHTML = `<div class="glass-card text-accent-red">❌ 无效竞品 URL: ${esc(cu)}</div>`;
           return;
         }
       }
@@ -410,7 +410,7 @@ export function renderHomePage() {
 
       } catch (err) {
         resultsArea.style.display = 'block';
-        resultsArea.innerHTML = `<div class="glass-card" style="color:var(--accent-red)">❌ ${esc(err.message || String(err))}</div>`;
+        resultsArea.innerHTML = `<div class="glass-card text-accent-red">❌ ${esc(err.message || String(err))}</div>`;
       } finally {
         progressArea.classList.remove('active');
         btnAnalyze.disabled = false;
@@ -478,7 +478,7 @@ export function renderHomePage() {
       } catch (err) {
         progressArea.classList.remove('active');
         resultsArea.style.display = 'block';
-        resultsArea.innerHTML = `<div class="glass-card" style="color:var(--accent-red)">❌ 操作失败: ${esc(err.message || String(err))}</div>`;
+        resultsArea.innerHTML = `<div class="glass-card text-accent-red">❌ 操作失败: ${esc(err.message || String(err))}</div>`;
       } finally {
         if (btnSpider) btnSpider.disabled = false;
       }

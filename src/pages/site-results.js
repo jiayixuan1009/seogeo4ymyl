@@ -14,7 +14,7 @@ export function renderSiteResults(containerId) {
     <div class="container animate-slide-up" style="padding-top:var(--space-4);padding-bottom:var(--space-10)">
 
       <!-- KPI Row -->
-      <div id="sr-kpi-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:var(--space-3);margin-bottom:var(--space-5)">
+      <div id="sr-kpi-row" class="grid gap-3 mb-5" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr))">
         ${kpi('sr-nodes-count',    '抓取页面数',                  'var(--accent-blue)')}
         ${kpi('sr-broken-count',   '死链 (404+Inlinks)',          'var(--accent-red)')}
         ${kpi('sr-orphan-count',   '孤岛页 (0 Inlinks)',          'var(--accent-orange)')}
@@ -27,22 +27,22 @@ export function renderSiteResults(containerId) {
       </div>
 
       <!-- Network Graph -->
-      <div class="glass-card" style="padding:0;overflow:hidden;border-color:var(--border-strong);margin-bottom:var(--space-5)">
-        <div style="padding:var(--space-3) var(--space-4);background:rgba(0,0,0,0.2);border-bottom:1px solid var(--border-default);display:flex;justify-content:space-between;align-items:center;">
-          <h3 style="margin:0;font-size:var(--font-size-base)">🕸️ 网站内链拓扑 (Silo Topology)</h3>
-          <div style="display:flex;gap:var(--space-3);align-items:center;font-size:11px;color:var(--text-muted)">
+      <div class="glass-card mb-5" style="padding:0; overflow:hidden; border-color:var(--border-strong)">
+        <div class="flex justify-between" style="padding:var(--space-3) var(--space-4); background:rgba(0,0,0,0.2); border-bottom:1px solid var(--border-default); align-items:center">
+          <h3 class="m-0 text-base">🕸️ 网站内链拓扑 (Silo Topology)</h3>
+          <div class="gap-3 text-[11px] text-muted" style="display:flex; align-items:center">
             <span>🟢 根页 / 普通页</span><span>🟡 孤岛页</span><span>🔴 死链</span>
             <span>支持缩放 / 拖拽</span>
           </div>
         </div>
-        <div id="${containerId}" style="width:100%;height:420px;background:#0d0e12"></div>
+        <div id="${containerId}" class="w-full" style="height:420px; background:#0d0e12"></div>
       </div>
 
       <!-- SEO Issue Panels -->
-      <div id="sr-issue-panels" style="margin-bottom:var(--space-6)">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3)">
-          <h3 style="font-size:var(--font-size-base);font-weight:700;margin:0">📋 SEO 问题清单</h3>
-          <button id="sr-export-btn" class="btn btn-secondary" style="font-size:var(--font-size-xs)">
+      <div id="sr-issue-panels" class="mb-6">
+        <div class="flex justify-between mb-3" style="align-items:center">
+          <h3 class="text-base font-bold m-0">📋 SEO 问题清单</h3>
+          <button id="sr-export-btn" class="btn btn-secondary text-xs">
             📥 导出问题 CSV
           </button>
         </div>
@@ -55,8 +55,8 @@ export function renderSiteResults(containerId) {
 
 function kpi(id, label, color) {
   return `
-    <div class="glass-card" style="text-align:center;padding:var(--space-3)">
-      <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">${label}</div>
+    <div class="glass-card text-center" style="padding:var(--space-3)">
+      <div class="text-[10px] text-muted" style="margin-bottom:4px">${label}</div>
       <div id="${id}" style="font-size:var(--font-size-xl);font-weight:900;color:${color}">—</div>
     </div>
   `;
@@ -128,7 +128,7 @@ export function renderSiteActions(actions) {
   if (!container) return;
 
   if (actions.length === 0) {
-    container.innerHTML = '<div class="glass-card" style="text-align:center;color:var(--accent-green)">✅ 全站 SEO 基础健康，暂无需要修复的问题。</div>';
+    container.innerHTML = '<div class="glass-card text-center text-accent-green">✅ 全站 SEO 基础健康，暂无需要修复的问题。</div>';
     return;
   }
 
@@ -140,26 +140,26 @@ export function renderSiteActions(actions) {
     const catLabel = catLabelRaw ? esc(catLabelRaw) : '';
     const hasURLs = act.list && act.list.length > 0;
     return `
-      <div class="glass-card" style="margin-bottom:var(--space-3);border-left:3px solid ${pm.color}">
-        <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);flex-wrap:wrap">
+      <div class="glass-card mb-3" style="border-left:3px solid ${pm.color}">
+        <div class="flex items-center gap-2 mb-2" style="flex-wrap:wrap">
           <span class="badge" style="background:${pm.bg}22;color:${pm.color}">${pm.label}</span>
           ${catLabel ? `<span class="badge badge-info">${catLabel}</span>` : ''}
-          <h4 style="margin:0;font-size:var(--font-size-sm);flex:1">${esc(act.title)}</h4>
+          <h4 class="m-0 text-sm" style="flex:1">${esc(act.title)}</h4>
         </div>
-        ${act.importance ? `<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;line-height:1.5">${esc(act.importance)}</div>` : ''}
+        ${act.importance ? `<div class="text-xs text-secondary" style="margin-bottom:8px; line-height:1.5">${esc(act.importance)}</div>` : ''}
         ${(act.riskOfNotDoing || act.benefitOfDoing) ? `
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-bottom:var(--space-2)">
-            ${act.riskOfNotDoing ? `<div style="background:rgba(255,77,106,0.05);padding:6px 8px;border-radius:4px"><div style="font-size:9px;color:var(--accent-red)">不修复的风险</div><div style="font-size:11px;color:var(--text-secondary)">${esc(act.riskOfNotDoing)}</div></div>` : ''}
-            ${act.benefitOfDoing ? `<div style="background:rgba(0,255,136,0.05);padding:6px 8px;border-radius:4px"><div style="font-size:9px;color:var(--accent-green)">修复后收益</div><div style="font-size:11px;color:var(--text-secondary)">${esc(act.benefitOfDoing)}</div></div>` : ''}
+          <div class="grid gap-2 mb-2" style="grid-template-columns:1fr 1fr">
+            ${act.riskOfNotDoing ? `<div style="background:rgba(255,77,106,0.05);padding:6px 8px;border-radius:4px"><div class="text-accent-red" style="font-size:9px">不修复的风险</div><div class="text-[11px] text-secondary">${esc(act.riskOfNotDoing)}</div></div>` : ''}
+            ${act.benefitOfDoing ? `<div style="background:rgba(0,255,136,0.05);padding:6px 8px;border-radius:4px"><div class="text-accent-green" style="font-size:9px">修复后收益</div><div class="text-[11px] text-secondary">${esc(act.benefitOfDoing)}</div></div>` : ''}
           </div>
         ` : ''}
-        <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:4px;font-size:13px">
+        <div class="text-[13px]" style="background:rgba(0,0,0,0.2); padding:10px; border-radius:4px">
           <strong>👉 建议行动：</strong> ${esc(act.action)}
         </div>
         ${hasURLs ? `
-          <details style="margin-top:8px;cursor:pointer">
-            <summary style="font-size:11px;color:var(--text-muted)">查看受影响的 URL（${act.list.length} 个）</summary>
-            <div style="padding:8px 0;font-size:11px;color:var(--text-muted);max-height:200px;overflow-y:auto">
+          <details class="cursor-pointer" style="margin-top:8px">
+            <summary class="text-[11px] text-muted">查看受影响的 URL（${act.list.length} 个）</summary>
+            <div class="text-[11px] text-muted" style="padding:8px 0; max-height:200px; overflow-y:auto">
               ${act.list.map((u) => `<div style="padding:2px 0;word-break:break-all">${esc(u)}</div>`).join('')}
             </div>
           </details>

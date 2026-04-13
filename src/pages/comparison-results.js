@@ -362,8 +362,8 @@ export function renderComparisonResults(myUrl, myPageData, competitorUrls, compe
       ${i === 0
         ? 'color:var(--accent-green);border-bottom:2px solid var(--accent-green)40'
         : 'color:var(--text-muted);border-bottom:1px solid var(--border-default)'}">
-      ${i === 0 ? '🏠 ' : `<span style="color:var(--text-muted);font-weight:400">#${i} </span>`}${esc(r.hostname)}
-      ${i === 0 ? '<div style="font-size:9px;font-weight:400;color:var(--accent-green);opacity:0.7;margin-top:2px">我方页面</div>' : ''}
+      ${i === 0 ? '🏠 ' : `<span class="text-muted font-normal">#${i} </span>`}${esc(r.hostname)}
+      ${i === 0 ? '<div class="font-normal text-accent-green" style="font-size:9px; opacity:0.7; margin-top:2px">我方页面</div>' : ''}
     </th>
   `).join('');
 
@@ -406,7 +406,7 @@ export function renderComparisonResults(myUrl, myPageData, competitorUrls, compe
 
   // Build gap cards
   const gapCards = gaps.length === 0
-    ? `<div class="glass-card" style="text-align:center;padding:var(--space-8);color:var(--accent-green)">
+    ? `<div class="glass-card text-center text-accent-green" style="padding:var(--space-8)">
         🎉 <strong>在所有对比维度中，我方页面均已达到或超越竞品！</strong>
        </div>`
     : gaps.map((g, gi) => {
@@ -418,33 +418,33 @@ export function renderComparisonResults(myUrl, myPageData, competitorUrls, compe
         const llmPromptBase = `我的页面 ${myUrl} 在「${g.field.label}」维度落后于竞品。\n我方现状：${g.myResult.value}\n竞品做法：${bestComp?.value || '达标'}\n请务实地给出3条具体、可直接执行的优化建议，包括建议的实际内容文字（如适用）。`;
 
         return `
-          <div class="glass-card cmp-gap-card" data-gap="${gi}" style="margin-bottom:var(--space-3);border-left:3px solid ${color}">
-            <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);flex-wrap:wrap">
+          <div class="glass-card cmp-gap-card mb-3" data-gap="${gi}" style="border-left:3px solid ${color}">
+            <div class="flex items-center gap-2 mb-2" style="flex-wrap:wrap">
               <span class="badge" style="background:${color}22;color:${color}">${label}</span>
               <span class="badge badge-info">${esc(g.field.category)}</span>
-              <h4 style="margin:0;font-size:var(--font-size-sm);flex:1">${esc(g.field.label)}</h4>
-              <button class="btn btn-secondary cmp-ai-btn"
+              <h4 class="m-0 text-sm" style="flex:1">${esc(g.field.label)}</h4>
+              <button class="btn btn-secondary cmp-ai-btn text-[11px] shrink-0"
                 data-prompt="${esc(llmPromptBase)}"
                 data-out="cmp-ai-${gi}"
-                style="font-size:11px;padding:3px 10px;background:var(--accent-blue);color:white;border:none;flex-shrink:0">
+                style="padding:3px 10px; background:var(--accent-blue); color:white; border:none">
                 ✨ AI 建议
               </button>
             </div>
             <div id="cmp-ai-${gi}" class="cmp-ai-output" style="display:none;margin-bottom:var(--space-2);padding:var(--space-3);
               background:rgba(0,0,0,0.25);border:1px solid rgba(77,159,255,0.2);border-radius:6px;
               font-size:13px;line-height:1.6;white-space:pre-wrap;color:var(--text-primary)"></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-bottom:var(--space-2)">
+            <div class="grid gap-2 mb-2" style="grid-template-columns:1fr 1fr">
               <div style="background:rgba(239,68,68,0.06);padding:8px 10px;border-radius:4px">
-                <div style="font-size:9px;color:var(--accent-red);margin-bottom:2px">❌ 我方现状</div>
-                <div style="font-size:12px;color:var(--text-primary)">${esc(g.myResult.value)}</div>
+                <div class="text-accent-red" style="font-size:9px; margin-bottom:2px">❌ 我方现状</div>
+                <div class="text-xs text-primary">${esc(g.myResult.value)}</div>
               </div>
               <div style="background:rgba(34,197,94,0.06);padding:8px 10px;border-radius:4px">
-                <div style="font-size:9px;color:var(--accent-green);margin-bottom:2px">✅ 竞品已做到</div>
-                <div style="font-size:12px;color:var(--text-primary)">${esc(bestComp?.value != null ? String(bestComp.value) : '达标')}</div>
+                <div class="text-accent-green" style="font-size:9px; margin-bottom:2px">✅ 竞品已做到</div>
+                <div class="text-xs text-primary">${esc(bestComp?.value != null ? String(bestComp.value) : '达标')}</div>
               </div>
             </div>
-            <div style="background:rgba(0,0,0,0.15);padding:10px 12px;border-radius:4px;font-size:13px;color:var(--text-primary)">
-              <strong style="color:var(--accent-blue)">👉 修复方案：</strong>${esc(fix)}
+            <div class="text-[13px] text-primary" style="background:rgba(0,0,0,0.15); padding:10px 12px; border-radius:4px">
+              <strong class="text-accent-blue">👉 修复方案：</strong>${esc(fix)}
             </div>
           </div>`;
       }).join('');
@@ -459,12 +459,12 @@ export function renderComparisonResults(myUrl, myPageData, competitorUrls, compe
     const pct = Math.round((passCount / total) * 100);
     const color = pct >= 70 ? 'var(--accent-green)' : pct >= 45 ? 'var(--accent-gold)' : 'var(--accent-red)';
     return `
-      <div style="text-align:center;flex:1">
-        <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">
+      <div class="text-center" style="flex:1">
+        <div class="text-[10px] text-muted" style="margin-bottom:4px">
           ${i === 0 ? '🏠 ' : ''}${esc(row.hostname)}
         </div>
         <div style="font-size:var(--font-size-2xl);font-weight:900;color:${color}">${pct}%</div>
-        <div style="font-size:10px;color:var(--text-muted)">${passCount}/${total} 通过</div>
+        <div class="text-[10px] text-muted">${passCount}/${total} 通过</div>
         <div style="margin-top:6px;height:4px;background:var(--bg-tertiary);border-radius:2px;overflow:hidden">
           <div style="height:100%;width:${pct}%;background:${color};border-radius:2px;transition:width 1s ease"></div>
         </div>
@@ -475,39 +475,39 @@ export function renderComparisonResults(myUrl, myPageData, competitorUrls, compe
     <div class="container animate-slide-up" style="padding-top:var(--space-4);padding-bottom:var(--space-10)">
 
       <!-- Header -->
-      <div class="glass-card animate-fade-in" style="margin-bottom:var(--space-5);border-color:rgba(77,159,255,0.2)">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:var(--space-3)">
+      <div class="glass-card animate-fade-in mb-5" style="border-color:rgba(77,159,255,0.2)">
+        <div class="flex justify-between gap-3" style="align-items:flex-start; flex-wrap:wrap">
           <div>
-            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">并排对比分析 · ${FIELDS.length} 个检查项</div>
-            <h2 style="margin:0;font-size:var(--font-size-xl);font-weight:800">⚔️ 竞品对等页面对比矩阵</h2>
-            <div style="margin-top:4px;font-size:12px;color:var(--text-muted)">
+            <div class="text-[11px] text-muted" style="margin-bottom:4px">并排对比分析 · ${FIELDS.length} 个检查项</div>
+            <h2 class="m-0 font-extrabold" style="font-size:var(--font-size-xl)">⚔️ 竞品对等页面对比矩阵</h2>
+            <div class="text-xs text-muted" style="margin-top:4px">
               ${esc(allRows[0].hostname)} vs ${allRows.slice(1).map((r) => esc(r.hostname)).join(' vs ')}
               ${keyword ? ` · 🎯 ${esc(keyword)}` : ''}
             </div>
           </div>
-          <div style="display:flex;gap:var(--space-3)">
-            ${critCount > 0 ? `<div style="text-align:center"><div style="font-size:var(--font-size-2xl);font-weight:900;color:var(--accent-red)">${critCount}</div><div style="font-size:10px;color:var(--text-muted)">必须修复</div></div>` : ''}
-            ${warnCount > 0 ? `<div style="text-align:center"><div style="font-size:var(--font-size-2xl);font-weight:900;color:var(--accent-orange)">${warnCount}</div><div style="font-size:10px;color:var(--text-muted)">改进机会</div></div>` : ''}
+          <div class="gap-3" style="display:flex">
+            ${critCount > 0 ? `<div class="text-center"><div class="text-accent-red" style="font-size:var(--font-size-2xl); font-weight:900">${critCount}</div><div class="text-[10px] text-muted">必须修复</div></div>` : ''}
+            ${warnCount > 0 ? `<div class="text-center"><div class="text-accent-orange" style="font-size:var(--font-size-2xl); font-weight:900">${warnCount}</div><div class="text-[10px] text-muted">改进机会</div></div>` : ''}
           </div>
         </div>
         <!-- Score bars -->
-        <div style="display:flex;gap:var(--space-4);margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--border-default)">
+        <div class="gap-4 mt-4" style="display:flex; padding-top:var(--space-4); border-top:1px solid var(--border-default)">
           ${summaryBars}
         </div>
       </div>
 
       <!-- Matrix Table -->
-      <div class="glass-card" style="padding:0;overflow:hidden;margin-bottom:var(--space-6)">
-        <div style="padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--border-default);display:flex;justify-content:space-between;align-items:center">
-          <h3 style="margin:0;font-size:var(--font-size-base)">📊 逐字段对比矩阵（${FIELDS.length} 项）</h3>
-          <div style="font-size:10px;color:var(--text-muted)">
-            <span style="color:var(--accent-green)">■</span> 达标 &nbsp;
+      <div class="glass-card mb-6" style="padding:0; overflow:hidden">
+        <div class="flex justify-between" style="padding:var(--space-3) var(--space-4); border-bottom:1px solid var(--border-default); align-items:center">
+          <h3 class="m-0 text-base">📊 逐字段对比矩阵（${FIELDS.length} 项）</h3>
+          <div class="text-[10px] text-muted">
+            <span class="text-accent-green">■</span> 达标 &nbsp;
             <span style="color:var(--accent-gold)">■</span> 需改进 &nbsp;
-            <span style="color:var(--accent-red)">■</span> 问题
+            <span class="text-accent-red">■</span> 问题
           </div>
         </div>
         <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-          <table style="width:100%;border-collapse:collapse;min-width:${400 + allRows.length * 160}px">
+          <table class="w-full" style="border-collapse:collapse; min-width:${400 + allRows.length * 160}px">
             <thead>
               <tr>
                 <th style="padding:var(--space-3) var(--space-4);font-size:11px;color:var(--text-muted);
@@ -523,14 +523,14 @@ export function renderComparisonResults(myUrl, myPageData, competitorUrls, compe
 
       <!-- Gap Cards -->
       <div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4)">
+        <div class="flex justify-between mb-4" style="align-items:center">
           <div>
-            <h3 style="margin:0;font-size:var(--font-size-base);font-weight:700">🎯 差距分析 & 行动方案</h3>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:2px">按严重程度排序，点击「✨ AI 建议」获取 LLM 定制优化内容</div>
+            <h3 class="m-0 text-base font-bold">🎯 差距分析 & 行动方案</h3>
+            <div class="text-[11px] text-muted" style="margin-top:2px">按严重程度排序，点击「✨ AI 建议」获取 LLM 定制优化内容</div>
           </div>
-          <div style="display:flex;gap:var(--space-2)">
-            <button id="comp-copy-gaps" class="btn btn-ghost" style="font-size:var(--font-size-xs)">📋 复制行动清单</button>
-            <button id="comp-export-csv" class="btn btn-ghost" style="font-size:var(--font-size-xs)">📥 导出 CSV</button>
+          <div class="gap-2" style="display:flex">
+            <button id="comp-copy-gaps" class="btn btn-ghost text-xs">📋 复制行动清单</button>
+            <button id="comp-export-csv" class="btn btn-ghost text-xs">📥 导出 CSV</button>
           </div>
         </div>
         ${gapCards}
@@ -591,7 +591,7 @@ export function initComparisonResults(container) {
       if (!outEl || !prompt) return;
 
       outEl.style.display = 'block';
-      outEl.innerHTML = '<span style="color:var(--text-muted)">正在调用 AI，请稍候... ⏳</span>';
+      outEl.innerHTML = '<span class="text-muted">正在调用 AI，请稍候... ⏳</span>';
       btn.disabled = true;
       btn.textContent = '生成中...';
 
@@ -604,7 +604,7 @@ export function initComparisonResults(container) {
         });
         btn.textContent = '✅ 已完成';
       } catch (err) {
-        outEl.innerHTML = `<span style="color:var(--accent-red)">⚠️ ${esc(err.message)}</span>`;
+        outEl.innerHTML = `<span class="text-accent-red">⚠️ ${esc(err.message)}</span>`;
         btn.textContent = '🔁 重试';
         btn.disabled = false;
       }
