@@ -497,11 +497,9 @@ function rwCompareShort(id, icon, label, currentVal, maxLen, promptAttr) {
             </button>
           </div>
           <textarea id="${id}-ta" rows="2"
-            style="width:100%;box-sizing:border-box;background:rgba(34,197,94,0.05);
-              border:1px solid rgba(34,197,94,0.2);color:var(--text-primary);
-              padding:9px 11px;border-radius:5px;font-size:12px;line-height:1.5;
+            style="width:100%;box-sizing:border-box;background:rgba(34,197,94,0.05); border:1px solid rgba(34,197,94,0.2);color:var(--text-primary); padding:9px 11px;border-radius:5px;font-size:12px;line-height:1.5;"
             placeholder="暂无 AI 输出..."
-            data-rw-sync data-rw-id="${id}"
+            data-rw-sync="true" data-rw-id="${id}"
           >${escapedCurrent}</textarea>
         </div>
       </div>
