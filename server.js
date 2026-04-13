@@ -114,12 +114,10 @@ app.post('/api/llm-proxy', async (req, res) => {
   if (!isUrlSafe(targetUrl)) return res.status(403).json({ error: 'SSRF Protection: Invalid LLM endpoint' });
 
   try {
-    // Inject API Key from secure backend environment
+    // Inject API Key from secure backend environment, forcefully overriding any stale frontend keys
     if (!options.headers) options.headers = {};
-    if (!options.headers['Authorization'] || options.headers['Authorization'] === 'Bearer ') {
-      const serverPresetKey = process.env.LLM_API_KEY || 'sk-none';
-      options.headers['Authorization'] = `Bearer ${serverPresetKey}`;
-    }
+    const serverPresetKey = process.env.LLM_API_KEY || 'sk-none';
+    options.headers['Authorization'] = `Bearer ${serverPresetKey}`;
 
     // Native node fetch uses strict TLS verification, securely protecting OpenAI traffic.
     const fetchResponse = await fetch(targetUrl, {
@@ -129,8 +127,9 @@ app.post('/api/llm-proxy', async (req, res) => {
     });
 
     res.status(fetchResponse.status);
+    const dropHeaders = ['content-encoding', 'transfer-encoding', 'content-length', 'connection'];
     for (const [key, val] of fetchResponse.headers) {
-      if (key !== 'content-encoding') res.setHeader(key, val);
+      if (!dropHeaders.includes(key.toLowerCase())) res.setHeader(key, val);
     }
 
     if (fetchResponse.body) {

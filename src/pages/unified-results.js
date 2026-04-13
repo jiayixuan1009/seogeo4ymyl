@@ -681,7 +681,7 @@ function renderPageRewriteStudio(result) {
       </div>
 
       <!-- Two-column layout -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);align-items:start">
+      <div id="rw-layout-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);align-items:start;transition:all 0.3s">
 
         <!-- ── LEFT: Before / After Fields ── -->
         <div>
@@ -836,8 +836,16 @@ function initPageRewriteStudio(container) {
       });
       btn.style.background = 'rgba(77,159,255,0.1)'; btn.style.color = 'var(--accent-blue)'; btn.style.fontWeight = '600';
       root.querySelectorAll('[id^="rw-tab-"]').forEach(el => el.style.display = 'none');
+      
       const p = root.querySelector(`#rw-tab-${btn.dataset.tab}`);
       if (p) p.style.display = 'block';
+
+      // Dynamic width layout adjustment per user request
+      const layoutGrid = root.querySelector('#rw-layout-grid');
+      if (layoutGrid) {
+        if (btn.dataset.tab === 'head') layoutGrid.style.gridTemplateColumns = '50% 50%'; // 50% width
+        else layoutGrid.style.gridTemplateColumns = '30% 70%'; // More space for Body
+      }
     });
   });
 
@@ -913,11 +921,12 @@ function initPageRewriteStudio(container) {
     if (allBtn) { allBtn.disabled = true; allBtn.textContent = '🌊 生成中...'; }
 
     const tasks = [
-      { id: 'rw-title', pct: 10, label: '生成 Title...' },
-      { id: 'rw-desc',  pct: 28, label: '生成 Meta Description...' },
-      { id: 'rw-h1',    pct: 46, label: '生成 H1...' },
-      { id: 'rw-intro', pct: 64, label: '生成引言段落...' },
-      { id: 'rw-faq',   pct: 82, label: '生成 FAQ（5条）...' },
+      { id: 'rw-title',  pct: 10, label: '生成 Title...' },
+      { id: 'rw-desc',   pct: 25, label: '生成 Meta Description...' },
+      { id: 'rw-h1',     pct: 40, label: '生成 H1...' },
+      { id: 'rw-intro',  pct: 60, label: '生成引言段落...' },
+      { id: 'rw-faq',    pct: 80, label: '生成 FAQ（5条）...' },
+      { id: 'rw-schema', pct: 95, label: '生成 Schema JSON-LD...' },
     ];
 
     try {

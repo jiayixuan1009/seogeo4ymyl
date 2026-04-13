@@ -50,7 +50,7 @@ export function saveLlmConfig(config) {
  */
 export function isLlmConfigured() {
   const config = getLlmConfig();
-  return !!(config.apiKey && config.apiKey.trim().length > 0);
+  return !!(config.baseUrl && config.baseUrl.trim().length > 0);
 }
 
 /**
