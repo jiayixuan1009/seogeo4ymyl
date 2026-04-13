@@ -1,4 +1,7 @@
-# 构建 + 可选 rsync。Secrets：DEPLOY_HOST, DEPLOY_USER, DEPLOY_PATH, DEPLOY_SSH_KEY（可选 DEPLOY_SSH_PORT）
+# Job build：安装依赖 + 构建（应始终在无代码问题时通过）
+# Job deploy：仅在配置了 4 个 Secret 时 rsync + 远程 npm ci + PM2；未配置则跳过（success）
+#
+# Secrets：DEPLOY_HOST, DEPLOY_USER, DEPLOY_PATH, DEPLOY_SSH_KEY（可选 DEPLOY_SSH_PORT）
 
 name: Deploy to server
 
@@ -12,16 +15,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    env:
-      # 让仍基于 Node20 的 Action 在 Node24 上跑，减少弃用告警（官方 Changelog 2025-09-19）
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: npm
@@ -35,6 +34,27 @@ jobs:
       - name: Verify dist
         run: test -f dist/index.html && ls -la dist/
 
+      - name: Upload dist for deploy job
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    # 未配齐 Secret 时不跑部署（避免 ssh/rsync 误失败拖红整单）
+    if: ${{ secrets.DEPLOY_HOST != '' && secrets.DEPLOY_USER != '' && secrets.DEPLOY_PATH != '' && secrets.DEPLOY_SSH_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
       - name: Rsync dist + Node 入口，并 reload PM2
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
@@ -44,10 +64,6 @@ jobs:
           DEPLOY_SSH_PORT: ${{ secrets.DEPLOY_SSH_PORT }}
         run: |
           set -eo pipefail
-          if [ -z "${DEPLOY_HOST:-}" ] || [ -z "${DEPLOY_USER:-}" ] || [ -z "${DEPLOY_PATH:-}" ] || [ -z "${DEPLOY_SSH_KEY:-}" ]; then
-            echo "::notice title=Skip deploy::Add DEPLOY_HOST, DEPLOY_USER, DEPLOY_PATH, DEPLOY_SSH_KEY in repo Secrets to enable rsync."
-            exit 0
-          fi
           PORT="${DEPLOY_SSH_PORT:-22}"
           if [ -z "$PORT" ]; then PORT=22; fi
           mkdir -p ~/.ssh
