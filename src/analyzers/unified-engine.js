@@ -120,6 +120,7 @@ export function runUnifiedAnalysis(pageData, options = {}) {
       moduleResults,
       queryAnalysis,
       competitiveAnalysis,
+      pageData,              // exposed for rewrite studio
     },
   };
 }

@@ -23,15 +23,16 @@ export function parseHtml(url, html) {
   return {
     url,
     source: 'live',
-    meta:       extractMeta(doc, url),
-    headings:   extractHeadings(doc),
-    content:    extractContent(doc),
-    links:      extractLinks(doc, url),
-    images:     extractImages(doc),
-    schemas:    extractJsonLd(doc),
-    security:   { isHttps: url.startsWith('https') },
+    meta:        extractMeta(doc, url),
+    headings:    extractHeadings(doc),
+    content:     extractContent(doc),
+    links:       extractLinks(doc, url),
+    images:      extractImages(doc),
+    schemas:     extractJsonLd(doc),
+    structure:   extractStructure(doc),      // NEW: tables, lists, FAQ
+    security:    { isHttps: url.startsWith('https') },
     performance: { htmlSize: new Blob([html]).size },
-    robots: null,
+    robots:  null,
     sitemap: null,
     llmsTxt: null,
   };
@@ -65,6 +66,27 @@ function extractMeta(doc, url) {
 function extractHeadings(doc) {
   const grab = (tag) => [...doc.querySelectorAll(tag)].map(el => el.textContent.trim()).filter(Boolean);
   return { h1: grab('h1'), h2: grab('h2'), h3: grab('h3') };
+}
+
+// === DOM Structure (tables, lists, FAQ) ===
+function extractStructure(doc) {
+  const hasList  = doc.querySelectorAll('ul, ol').length > 0;
+  const hasTable = doc.querySelectorAll('table').length > 0;
+
+  // FAQ detection: FAQ schema OR DOM pattern (dt/dd pairs, or details/summary)
+  const hasFaqSchema = [...doc.querySelectorAll('script[type="application/ld+json"]')].some(s => {
+    try { const j = JSON.parse(s.textContent); return j['@type'] === 'FAQPage' || (j['@graph'] || []).some(n => n['@type'] === 'FAQPage'); } catch { return false; }
+  });
+  const hasFaqDom = doc.querySelectorAll('details > summary, [class*="faq"], [id*="faq"]').length > 0;
+  const hasFaq    = hasFaqSchema || hasFaqDom;
+
+  // Count FAQ items (Q&A pairs)
+  const faqItems  = Math.max(
+    doc.querySelectorAll('details').length,
+    doc.querySelectorAll('[class*="faq"] [class*="question"], [class*="faq"] [class*="item"]').length,
+  );
+
+  return { hasList, hasTable, hasFaq, faqItems };
 }
 
 // === Content ===
