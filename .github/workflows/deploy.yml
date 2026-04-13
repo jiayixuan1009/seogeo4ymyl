@@ -1,4 +1,5 @@
 # build：与 Vite 8 的 Node 要求一致（^20.19 或 >=22.12）；deploy：可选，continue-on-error
+# 若仓库 Settings → Actions → Workflow permissions 为「Read」默认，须显式授予 actions: write，否则 upload-artifact 会失败。
 
 name: Deploy to server
 
@@ -6,6 +7,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
 
 concurrency:
   group: deploy-seotool
