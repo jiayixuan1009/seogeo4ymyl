@@ -32,3 +32,12 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Local scratch / exports (never deploy from here; keep out of Git)
+/tmp/
+/exports/
+/uploads/
+
+# Test / coverage artifacts
+coverage/
+.nyc_output/
