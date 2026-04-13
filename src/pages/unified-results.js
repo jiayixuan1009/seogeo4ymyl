@@ -624,15 +624,15 @@ function renderPageRewriteStudio(result) {
   const titleLen  = pd.meta?.titleLength  || curTitle.length;
   const descLen   = pd.meta?.descriptionLength || curDesc.length;
 
-  // ── Prompt builders ───────────────────────────────────────────────────────
+  // ── Smart Prompts for Content Overhaul ────────────────────────────────────
   const mkTitle = () =>
-    `你是世界顶级 SEO 专家。为以下页面输出1条优化后的 <title> 标签内容，不包含任何说明文字。\nURL: ${url}\n关键词: ${keyword || '(根据URL推断)'}\n当前Title: "${curTitle || '(缺失)'}"\n要求: 45-60字符，核心关键词在前，| 分隔品牌名。直接输出结果。`;
+    `你是顶级 Fintech SEO 内容专家。为以下页面生成高点击率的 Title 标签（50-60字符，含关键词，吸引点击，符合YMYL信任感），直接在一行内输出结果，不要解释。如果评估后认为当前标题已完全符合要求无需修改，请严格仅输出"{无需修改}"五字。\nURL: ${url}\n当前标题: "${curTitle}"\n关键词: ${keyword || '(根据URL推断)'}`;
 
   const mkDesc = () =>
-    `你是世界顶级 SEO 专家。为以下页面输出1条优化后的 Meta Description，不包含任何说明文字。\nURL: ${url}\n关键词: ${keyword || '(根据URL推断)'}\n当前描述: "${curDesc || '(缺失)'}"\n要求: 120-150字符，含关键词，末尾加行动号召。直接输出结果。`;
+    `你是顶级 Fintech SEO 内容专家。为以下页面生成高转化 Meta Description（130-150字符，概括核心价值并带CTA）。直接输出结果，不要解释。如果当前描述已极具吸引力无需优化，请严格仅输出"{无需修改}"五字。\nURL: ${url}\n当前描述: "${curDesc}"\n关键词: ${keyword || '(根据URL推断)'}`;
 
   const mkH1 = () =>
-    `你是世界顶级 SEO 专家。为以下页面输出1个优化后的 H1 标题，不包含任何说明文字。\nURL: ${url}\n关键词: ${keyword || '(根据URL推断)'}\n当前H1: "${curH1 || '(缺失)'}"\n要求: 20-50字符，包含核心关键词，对用户有吸引力。直接输出结果。`;
+    `你是顶级 Fintech SEO 内容专家。为以下页面生成核心 H1 标题（直接输出一句话标题，不要解释）。如果当前 H1 已完美紧扣主题无需修改，请严格仅输出"{无需修改}"五字。\nURL: ${url}\n当前H1: "${curH1}"\n关键词: ${keyword || '(根据URL推断)'}`;
 
   const mkIntro = () =>
     `你是顶级 Fintech 内容专家。为以下页面生成首屏引言段落，不包含任何标题和说明文字。\nURL: ${url}\n关键词: ${keyword || '(根据URL推断)'}\nH1: "${curH1 || curTitle}"\n要求: 100-160词，首句含核心关键词，阐述用户痛点，引导继续阅读。直接输出段落正文。`;
@@ -771,7 +771,16 @@ function initPageRewriteStudio(container) {
   if (!root) return;
 
   // State
-  const fields = { 'rw-title':'', 'rw-desc':'', 'rw-h1':'', 'rw-intro':'', 'rw-faq':'', 'rw-schema':'' };
+  const defaultValues = {
+    'rw-title': curTitle,
+    'rw-desc':  curDesc,
+    'rw-h1':    curH1,
+    'rw-intro': '',
+    'rw-faq':   '',
+    'rw-schema': ''
+  };
+
+  const fields = { ...defaultValues };
 
   // Seed with current page values from textareas
   for (const id of Object.keys(fields)) {
@@ -890,8 +899,22 @@ function initPageRewriteStudio(container) {
         fields[id] = buffer;
         refreshCode();
       });
-      ta.style.borderColor = 'rgba(34,197,94,0.4)';
-      ta.placeholder = '';
+      
+      const cleanBuffer = buffer.trim();
+      const badge = document.getElementById(`${id}-ai-badge`);
+      
+      if (cleanBuffer === '{无需修改}' || cleanBuffer === '"{无需修改}"') {
+        buffer = defaultValues[id] || '';
+        ta.value = buffer;
+        fields[id] = buffer;
+        refreshCode();
+        ta.style.borderColor = 'rgba(255,255,255,0.1)';
+        if (badge) badge.innerHTML = `<span style="color:var(--text-muted);font-weight:normal;text-transform:none">（当前已最优，保留原版）</span>`;
+      } else {
+        ta.style.borderColor = 'rgba(34,197,94,0.4)';
+        if (badge) badge.innerText = '';
+      }
+      
     } catch (err) {
       ta.value = '';
       ta.style.borderColor = 'rgba(239,68,68,0.3)';
