@@ -1,12 +1,13 @@
-# 推送到 main 或手动触发：构建前端并 rsync 到云服务器，远程 npm ci + PM2 重载。
+# 推送到 main 或手动触发：构建前端；若已配置 Secrets 则 rsync 到云服务器并 PM2 重载。
 #
 # 在 GitHub 仓库 Settings → Secrets and variables → Actions 中配置：
-#   DEPLOY_HOST      服务器 IP 或域名（如 47.x.x.x 或 seo.cryptooptiontool.com）
-#   DEPLOY_USER      SSH 登录用户（如 root 或 deploy）
-#   DEPLOY_PATH      站点根目录，须与 Nginx root 一致（如 /var/www/seotool）
-#   DEPLOY_SSH_KEY   私钥全文（-----BEGIN ... PRIVATE KEY----- 起至 END 止）
-# 可选：
-#   DEPLOY_SSH_PORT  非 22 时填写
+#   DEPLOY_HOST      服务器 IP 或域名
+#   DEPLOY_USER      SSH 用户
+#   DEPLOY_PATH      站点根目录（如 /var/www/seotool）
+#   DEPLOY_SSH_KEY   SSH 私钥全文
+# 可选：DEPLOY_SSH_PORT（非 22 时）
+#
+# 未配置上述 Secrets 时：构建仍会执行并成功，仅跳过 rsync（避免 workflow 整单失败）。
 
 name: Deploy to server
 
@@ -14,6 +15,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+
+# 让 checkout/setup-node 等 Action 使用 Node 24，减少弃用告警（见 GitHub Changelog 2025-09-19）
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 concurrency:
   group: deploy-seotool
@@ -27,7 +32,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: npm
 
       - run: npm ci
@@ -44,8 +49,8 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${DEPLOY_HOST:-}" ] || [ -z "${DEPLOY_USER:-}" ] || [ -z "${DEPLOY_PATH:-}" ] || [ -z "${DEPLOY_SSH_KEY:-}" ]; then
-            echo "::error::缺少 Secrets：请配置 DEPLOY_HOST、DEPLOY_USER、DEPLOY_PATH、DEPLOY_SSH_KEY"
-            exit 1
+            echo "::notice title=跳过部署::未配置 DEPLOY_HOST / DEPLOY_USER / DEPLOY_PATH / DEPLOY_SSH_KEY 时只构建、不上传。到 Settings → Secrets → Actions 填写后再次推送即可自动部署。"
+            exit 0
           fi
           PORT="${DEPLOY_SSH_PORT:-22}"
           mkdir -p ~/.ssh
