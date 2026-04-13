@@ -18,16 +18,15 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      # 使用 .node-version（20.19 + check-latest）满足 Vite 8 的 ^20.19.0，避免 '22' 装到 22.11.x
-      - uses: actions/setup-node@v6
+      # 与 Vite 8 一致：^20.19；版本写死在 workflow，避免仅依赖 .node-version 解析差异
+      - uses: actions/setup-node@v4
         with:
-          node-version-file: '.node-version'
-          check-latest: true
-          # 先关缓存，排除 Actions 缓存损坏导致 npm ci / build 偶发失败
+          node-version: '20.19.6'
+          cache: npm
 
       - name: Print toolchain
         run: node -v && npm -v
@@ -39,7 +38,10 @@ jobs:
         run: npm run build
 
       - name: Verify dist
-        run: test -f dist/index.html && ls -la dist/
+        run: |
+          set -euo pipefail
+          test -f dist/index.html
+          ls -la dist/
 
       - name: Upload dist for deploy job
         uses: actions/upload-artifact@v4
@@ -51,9 +53,9 @@ jobs:
   deploy:
     needs: build
     continue-on-error: true
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Download dist
         uses: actions/download-artifact@v4
