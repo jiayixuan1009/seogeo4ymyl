@@ -3,6 +3,7 @@
 // Uses the exact NormalizedPageData structure from core/parser.js
 
 import { getLlmConfig, streamContent } from '../core/engine/llm-orchestrator.js';
+import { esc } from '../utils/html-escape.js';
 
 // ── Field extraction (maps exactly to parser.js output) ───────────────────────
 function extractFields(url, pageData) {
@@ -361,7 +362,7 @@ export function renderComparisonResults(myUrl, myPageData, competitorUrls, compe
       ${i === 0
         ? 'color:var(--accent-green);border-bottom:2px solid var(--accent-green)40'
         : 'color:var(--text-muted);border-bottom:1px solid var(--border-default)'}">
-      ${i === 0 ? '🏠 ' : `<span style="color:var(--text-muted);font-weight:400">#${i} </span>`}${r.hostname}
+      ${i === 0 ? '🏠 ' : `<span style="color:var(--text-muted);font-weight:400">#${i} </span>`}${esc(r.hostname)}
       ${i === 0 ? '<div style="font-size:9px;font-weight:400;color:var(--accent-green);opacity:0.7;margin-top:2px">我方页面</div>' : ''}
     </th>
   `).join('');
@@ -375,7 +376,7 @@ export function renderComparisonResults(myUrl, myPageData, competitorUrls, compe
           background:rgba(255,255,255,0.025);font-size:10px;font-weight:700;
           text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);
           border-top:1px solid var(--border-default);border-bottom:1px solid var(--border-default)40">
-          ${cat}
+          ${esc(cat)}
         </td>
       </tr>`;
     const dataRows = catFields.map(field => {
@@ -388,14 +389,14 @@ export function renderComparisonResults(myUrl, myPageData, competitorUrls, compe
             background:${s.bg};border-bottom:1px solid var(--border-default)30;
             ${i === 0 ? 'border-left:2px solid rgba(34,197,94,0.3)' : ''};
             color:${s.text};word-break:break-word;max-width:200px;line-height:1.4">
-            ${result.value}
+            ${esc(result.value)}
           </td>`;
       }).join('');
       return `
         <tr>
           <td style="padding:var(--space-2) var(--space-4);font-size:11px;color:var(--text-muted);
             border-bottom:1px solid var(--border-default)30;white-space:nowrap">
-            ${field.label}
+            ${esc(field.label)}
           </td>
           ${cells}
         </tr>`;
@@ -420,10 +421,10 @@ export function renderComparisonResults(myUrl, myPageData, competitorUrls, compe
           <div class="glass-card cmp-gap-card" data-gap="${gi}" style="margin-bottom:var(--space-3);border-left:3px solid ${color}">
             <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);flex-wrap:wrap">
               <span class="badge" style="background:${color}22;color:${color}">${label}</span>
-              <span class="badge badge-info">${g.field.category}</span>
-              <h4 style="margin:0;font-size:var(--font-size-sm);flex:1">${g.field.label}</h4>
+              <span class="badge badge-info">${esc(g.field.category)}</span>
+              <h4 style="margin:0;font-size:var(--font-size-sm);flex:1">${esc(g.field.label)}</h4>
               <button class="btn btn-secondary cmp-ai-btn"
-                data-prompt="${llmPromptBase.replace(/"/g, '&quot;')}"
+                data-prompt="${esc(llmPromptBase)}"
                 data-out="cmp-ai-${gi}"
                 style="font-size:11px;padding:3px 10px;background:var(--accent-blue);color:white;border:none;flex-shrink:0">
                 ✨ AI 建议
@@ -435,15 +436,15 @@ export function renderComparisonResults(myUrl, myPageData, competitorUrls, compe
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-bottom:var(--space-2)">
               <div style="background:rgba(239,68,68,0.06);padding:8px 10px;border-radius:4px">
                 <div style="font-size:9px;color:var(--accent-red);margin-bottom:2px">❌ 我方现状</div>
-                <div style="font-size:12px;color:var(--text-primary)">${g.myResult.value}</div>
+                <div style="font-size:12px;color:var(--text-primary)">${esc(g.myResult.value)}</div>
               </div>
               <div style="background:rgba(34,197,94,0.06);padding:8px 10px;border-radius:4px">
                 <div style="font-size:9px;color:var(--accent-green);margin-bottom:2px">✅ 竞品已做到</div>
-                <div style="font-size:12px;color:var(--text-primary)">${bestComp?.value || '达标'}</div>
+                <div style="font-size:12px;color:var(--text-primary)">${esc(bestComp?.value != null ? String(bestComp.value) : '达标')}</div>
               </div>
             </div>
             <div style="background:rgba(0,0,0,0.15);padding:10px 12px;border-radius:4px;font-size:13px;color:var(--text-primary)">
-              <strong style="color:var(--accent-blue)">👉 修复方案：</strong>${fix}
+              <strong style="color:var(--accent-blue)">👉 修复方案：</strong>${esc(fix)}
             </div>
           </div>`;
       }).join('');
@@ -460,7 +461,7 @@ export function renderComparisonResults(myUrl, myPageData, competitorUrls, compe
     return `
       <div style="text-align:center;flex:1">
         <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">
-          ${i === 0 ? '🏠 ' : ''}${row.hostname}
+          ${i === 0 ? '🏠 ' : ''}${esc(row.hostname)}
         </div>
         <div style="font-size:var(--font-size-2xl);font-weight:900;color:${color}">${pct}%</div>
         <div style="font-size:10px;color:var(--text-muted)">${passCount}/${total} 通过</div>
@@ -480,8 +481,8 @@ export function renderComparisonResults(myUrl, myPageData, competitorUrls, compe
             <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">并排对比分析 · ${FIELDS.length} 个检查项</div>
             <h2 style="margin:0;font-size:var(--font-size-xl);font-weight:800">⚔️ 竞品对等页面对比矩阵</h2>
             <div style="margin-top:4px;font-size:12px;color:var(--text-muted)">
-              ${allRows[0].hostname} vs ${allRows.slice(1).map(r => r.hostname).join(' vs ')}
-              ${keyword ? ` · 🎯 ${keyword}` : ''}
+              ${esc(allRows[0].hostname)} vs ${allRows.slice(1).map((r) => esc(r.hostname)).join(' vs ')}
+              ${keyword ? ` · 🎯 ${esc(keyword)}` : ''}
             </div>
           </div>
           <div style="display:flex;gap:var(--space-3)">
@@ -598,12 +599,12 @@ export function initComparisonResults(container) {
         let first = true;
         await streamContent(prompt, chunk => {
           if (first) { outEl.innerHTML = ''; first = false; }
-          outEl.innerHTML += chunk.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          outEl.innerHTML += esc(chunk);
           outEl.scrollTop = outEl.scrollHeight;
         });
         btn.textContent = '✅ 已完成';
       } catch (err) {
-        outEl.innerHTML = `<span style="color:var(--accent-red)">⚠️ ${err.message}</span>`;
+        outEl.innerHTML = `<span style="color:var(--accent-red)">⚠️ ${esc(err.message)}</span>`;
         btn.textContent = '🔁 重试';
         btn.disabled = false;
       }

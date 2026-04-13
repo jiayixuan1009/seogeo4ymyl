@@ -15,6 +15,11 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Behind nginx / vite proxy: use X-Forwarded-* for client IP (rate limit). Set TRUST_PROXY=0 to disable.
+if (process.env.TRUST_PROXY !== '0') {
+  app.set('trust proxy', 1);
+}
+
 // ==========================================
 // 🛡️ SECURITY & RELIABILITY CONFIGURATION
 // ==========================================
@@ -44,15 +49,36 @@ app.use(express.json({ limit: '5mb' }));
 // ==========================================
 // Safelist approach covering common internal and cloud metadata IPs
 const FORBIDDEN_HOSTS = [
-  /^127\./, /^10\./, /^172\.(1[6-9]|2[0-9]|3[0-1])\./, /^192\.168\./, 
+  /^127\./, /^10\./, /^172\.(1[6-9]|2[0-9]|3[0-1])\./, /^192\.168\./,
   /^169\.254\./, /^0\./, /localhost/i, /\.local$/i, /\[::\]/
 ];
+
+const MAX_PROXY_BODY_BYTES = 10 * 1024 * 1024;
+
+/** OpenAI-compatible chat endpoints only — matches PROVIDER_PRESETS in llm-orchestrator.js */
+const DEFAULT_LLM_HOSTS = [
+  'api.deepseek.com',
+  'api.moonshot.cn',
+  'dashscope.aliyuncs.com',
+  'generativelanguage.googleapis.com',
+  'api.openai.com',
+];
+
+function getAllowedLlmHostSet() {
+  const extra = (process.env.LLM_ALLOWED_HOSTS_EXTRA || '')
+    .split(',')
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+  return new Set([...DEFAULT_LLM_HOSTS.map((h) => h.toLowerCase()), ...extra]);
+}
+
+const ALLOWED_LLM_HOSTS = getAllowedLlmHostSet();
 
 function isUrlSafe(targetUrl) {
   try {
     const urlObj = new URL(targetUrl);
     if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') return false;
-    
+
     const hostname = urlObj.hostname;
     for (const regex of FORBIDDEN_HOSTS) {
       if (regex.test(hostname)) return false;
@@ -63,9 +89,48 @@ function isUrlSafe(targetUrl) {
   }
 }
 
+/**
+ * P0: Only forward server-side API keys to known LLM provider hosts.
+ * Path must be .../chat/completions (OpenAI-compatible).
+ */
+function isAllowedLlmTargetUrl(targetUrl) {
+  try {
+    const u = new URL(targetUrl);
+    if (u.protocol !== 'https:') return false;
+    if (u.username || u.password) return false;
+    if (!ALLOWED_LLM_HOSTS.has(u.hostname.toLowerCase())) return false;
+    const p = u.pathname.replace(/\/+$/, '') || '/';
+    if (!p.endsWith('/chat/completions')) return false;
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+async function readResponseBodyWithLimit(response, maxBytes) {
+  if (!response.body) return '';
+  let total = 0;
+  const chunks = [];
+  for await (const chunk of response.body) {
+    const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    total += buf.length;
+    if (total > maxBytes) {
+      const err = new Error('RESPONSE_TOO_LARGE');
+      err.code = 'RESPONSE_TOO_LARGE';
+      throw err;
+    }
+    chunks.push(buf);
+  }
+  return Buffer.concat(chunks).toString('utf8');
+}
+
+function clientSafeError(_error) {
+  return { error: 'Request failed' };
+}
+
 // Secure local scraper dispatcher (Avoids global NODE_TLS_REJECT_UNAUTHORIZED='0')
-const insecureDispatcher = new Agent({ 
-  connect: { rejectUnauthorized: false } 
+const insecureDispatcher = new Agent({
+  connect: { rejectUnauthorized: false },
 });
 
 // ==========================================
@@ -83,52 +148,57 @@ app.get('/api/proxy', async (req, res) => {
     const response = await undiciFetch(targetUrl, {
       dispatcher: insecureDispatcher, // Scrape broken SSL sites securely without exposing process
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      }
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      },
     });
 
     if (!response.ok) {
       return res.status(response.status).send(`Proxy fetch failed with status: ${response.status}`);
     }
 
-    // Protect against massive file downloads hanging the server memory
     const contentLength = response.headers.get('content-length');
-    if (contentLength && parseInt(contentLength, 10) > 10 * 1024 * 1024) {
+    if (contentLength && parseInt(contentLength, 10) > MAX_PROXY_BODY_BYTES) {
       return res.status(413).json({ error: 'Response payload too large (> 10MB)' });
     }
 
     const contentType = response.headers.get('content-type');
     if (contentType) res.setHeader('Content-Type', contentType);
 
-    const text = await response.text();
+    const text = await readResponseBodyWithLimit(response, MAX_PROXY_BODY_BYTES);
     res.send(text);
   } catch (error) {
     console.error(`Scrape Proxy error for ${targetUrl}:`, error.message);
-    res.status(500).json({ error: 'Proxy request failed', details: error.message });
+    if (error.code === 'RESPONSE_TOO_LARGE') {
+      return res.status(413).json({ error: 'Response payload too large (> 10MB)' });
+    }
+    res.status(500).json(clientSafeError(error));
   }
 });
 
-// 2. LLM Streaming Proxy (Uses STRCIT TLS)
+// 2. LLM Streaming Proxy (Uses strict TLS)
 app.post('/api/llm-proxy', async (req, res) => {
   const { targetUrl, options } = req.body;
   if (!targetUrl || !options) return res.status(400).json({ error: 'Missing targetUrl or options' });
   if (!isUrlSafe(targetUrl)) return res.status(403).json({ error: 'SSRF Protection: Invalid LLM endpoint' });
+  if (!isAllowedLlmTargetUrl(targetUrl)) {
+    return res.status(403).json({
+      error: 'LLM proxy: endpoint not allowed',
+      hint: 'Use a built-in provider Base URL or set LLM_ALLOWED_HOSTS_EXTRA on the server.',
+    });
+  }
 
   try {
-    // Inject API Key from secure backend environment, forcefully overriding any stale frontend keys
-    if (!options.headers) options.headers = {};
+    const headers = { ...(options.headers || {}) };
     const rawKey = process.env.LLM_API_KEY || 'sk-none';
     const serverPresetKey = rawKey.trim().replace(/['"]/g, '');
-    options.headers['Authorization'] = `Bearer ${serverPresetKey}`;
+    headers['Authorization'] = `Bearer ${serverPresetKey}`;
 
-    // Native node fetch uses strict TLS verification, securely protecting OpenAI traffic.
     const fetchResponse = await fetch(targetUrl, {
       method: options.method || 'POST',
-      headers: options.headers,
+      headers,
       body: JSON.stringify(options.body),
     });
 
-    // Ensure Express knows this is a continuous SSE stream so it flushes to browser instantly
     res.status(fetchResponse.status);
     res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache');
@@ -142,7 +212,7 @@ app.post('/api/llm-proxy', async (req, res) => {
     res.end();
   } catch (error) {
     console.error(`LLM Proxy error for ${targetUrl}:`, error.message);
-    res.status(500).json({ error: 'LLM Proxy failed', details: error.message });
+    res.status(500).json(clientSafeError(error));
   }
 });
 

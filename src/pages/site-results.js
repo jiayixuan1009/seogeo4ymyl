@@ -1,6 +1,7 @@
 // ===== SEOGEO4YMYL — Site-Level Results Page & Topology Graph (v2) =====
 
 import { Network } from 'vis-network';
+import { esc } from '../utils/html-escape.js';
 
 // ── Shared state ─────────────────────────────────────────────────────────────
 let _actions = [];
@@ -135,30 +136,31 @@ export function renderSiteActions(actions) {
 
   const html = actions.map((act, i) => {
     const pm = PRIORITY_META[act.execPriority] || PRIORITY_META.P2;
-    const catLabel = catLabels[act.category] || act.category || '';
+    const catLabelRaw = catLabels[act.category] || act.category || '';
+    const catLabel = catLabelRaw ? esc(catLabelRaw) : '';
     const hasURLs = act.list && act.list.length > 0;
     return `
       <div class="glass-card" style="margin-bottom:var(--space-3);border-left:3px solid ${pm.color}">
         <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);flex-wrap:wrap">
           <span class="badge" style="background:${pm.bg}22;color:${pm.color}">${pm.label}</span>
           ${catLabel ? `<span class="badge badge-info">${catLabel}</span>` : ''}
-          <h4 style="margin:0;font-size:var(--font-size-sm);flex:1">${act.title}</h4>
+          <h4 style="margin:0;font-size:var(--font-size-sm);flex:1">${esc(act.title)}</h4>
         </div>
-        ${act.importance ? `<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;line-height:1.5">${act.importance}</div>` : ''}
+        ${act.importance ? `<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;line-height:1.5">${esc(act.importance)}</div>` : ''}
         ${(act.riskOfNotDoing || act.benefitOfDoing) ? `
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-bottom:var(--space-2)">
-            ${act.riskOfNotDoing ? `<div style="background:rgba(255,77,106,0.05);padding:6px 8px;border-radius:4px"><div style="font-size:9px;color:var(--accent-red)">不修复的风险</div><div style="font-size:11px;color:var(--text-secondary)">${act.riskOfNotDoing}</div></div>` : ''}
-            ${act.benefitOfDoing ? `<div style="background:rgba(0,255,136,0.05);padding:6px 8px;border-radius:4px"><div style="font-size:9px;color:var(--accent-green)">修复后收益</div><div style="font-size:11px;color:var(--text-secondary)">${act.benefitOfDoing}</div></div>` : ''}
+            ${act.riskOfNotDoing ? `<div style="background:rgba(255,77,106,0.05);padding:6px 8px;border-radius:4px"><div style="font-size:9px;color:var(--accent-red)">不修复的风险</div><div style="font-size:11px;color:var(--text-secondary)">${esc(act.riskOfNotDoing)}</div></div>` : ''}
+            ${act.benefitOfDoing ? `<div style="background:rgba(0,255,136,0.05);padding:6px 8px;border-radius:4px"><div style="font-size:9px;color:var(--accent-green)">修复后收益</div><div style="font-size:11px;color:var(--text-secondary)">${esc(act.benefitOfDoing)}</div></div>` : ''}
           </div>
         ` : ''}
         <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:4px;font-size:13px">
-          <strong>👉 建议行动：</strong> ${act.action}
+          <strong>👉 建议行动：</strong> ${esc(act.action)}
         </div>
         ${hasURLs ? `
           <details style="margin-top:8px;cursor:pointer">
             <summary style="font-size:11px;color:var(--text-muted)">查看受影响的 URL（${act.list.length} 个）</summary>
             <div style="padding:8px 0;font-size:11px;color:var(--text-muted);max-height:200px;overflow-y:auto">
-              ${act.list.map(u => `<div style="padding:2px 0;word-break:break-all">${u}</div>`).join('')}
+              ${act.list.map((u) => `<div style="padding:2px 0;word-break:break-all">${esc(u)}</div>`).join('')}
             </div>
           </details>
         ` : ''}

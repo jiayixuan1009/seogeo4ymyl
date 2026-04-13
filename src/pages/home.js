@@ -12,6 +12,7 @@ import { parseScreamingFrogCSV } from '../core/csv-parser.js';
 import { analyzeSiteData } from '../core/engine/site-rule-engine.js';
 import { renderSiteResults, drawNetworkGraph, renderSiteActions, fillSiteKpis } from './site-results.js';
 import { getLlmConfig, saveLlmConfig, DEFAULT_CONFIG } from '../core/engine/llm-orchestrator.js';
+import { esc } from '../utils/html-escape.js';
 
 export function renderHomePage() {
   const html = `
@@ -338,7 +339,7 @@ export function renderHomePage() {
       // Validate URL
       try { new URL(url); } catch {
         resultsArea.style.display = 'block';
-        resultsArea.innerHTML = `<div class="glass-card" style="color:var(--accent-red)">❌ 无效 URL: ${url}</div>`;
+        resultsArea.innerHTML = `<div class="glass-card" style="color:var(--accent-red)">❌ 无效 URL: ${esc(url)}</div>`;
         return;
       }
 
@@ -349,7 +350,7 @@ export function renderHomePage() {
       for (const cu of competitorUrls) {
         try { new URL(cu); } catch {
           resultsArea.style.display = 'block';
-          resultsArea.innerHTML = `<div class="glass-card" style="color:var(--accent-red)">❌ 无效竞品 URL: ${cu}</div>`;
+          resultsArea.innerHTML = `<div class="glass-card" style="color:var(--accent-red)">❌ 无效竞品 URL: ${esc(cu)}</div>`;
           return;
         }
       }
@@ -410,7 +411,7 @@ export function renderHomePage() {
 
       } catch (err) {
         resultsArea.style.display = 'block';
-        resultsArea.innerHTML = `<div class="glass-card" style="color:var(--accent-red)">❌ ${err.message || String(err)}</div>`;
+        resultsArea.innerHTML = `<div class="glass-card" style="color:var(--accent-red)">❌ ${esc(err.message || String(err))}</div>`;
       } finally {
         progressArea.classList.remove('active');
         btnAnalyze.disabled = false;
@@ -478,7 +479,7 @@ export function renderHomePage() {
       } catch (err) {
         progressArea.classList.remove('active');
         resultsArea.style.display = 'block';
-        resultsArea.innerHTML = `<div class="glass-card" style="color:var(--accent-red)">❌ 操作失败: ${err.message || String(err)}</div>`;
+        resultsArea.innerHTML = `<div class="glass-card" style="color:var(--accent-red)">❌ 操作失败: ${esc(err.message || String(err))}</div>`;
       } finally {
         if (btnSpider) btnSpider.disabled = false;
       }

@@ -1,5 +1,7 @@
 // ===== SEOGEO4YMYL — Audit Result Formatter (7-element) =====
 
+import { esc } from '../utils/html-escape.js';
+
 /**
  * Create a standardized 7-element audit item
  * @param {Object} params
@@ -66,7 +68,7 @@ export function impactBadgeHtml(impact) {
     Pass: 'badge-pass',
     Info: 'badge-info',
   }[impact] || 'badge-info';
-  return `<span class="badge ${cls}">${impact}</span>`;
+  return `<span class="badge ${cls}">${esc(impact)}</span>`;
 }
 
 /**
@@ -74,5 +76,5 @@ export function impactBadgeHtml(impact) {
  */
 export function confidenceBadgeHtml(confidence) {
   const icons = { Confirmed: '✅', Likely: '🔶', Hypothesis: '🔷' };
-  return `<span class="badge badge-info">${icons[confidence] || ''} ${confidence}</span>`;
+  return `<span class="badge badge-info">${icons[confidence] || ''} ${esc(confidence)}</span>`;
 }

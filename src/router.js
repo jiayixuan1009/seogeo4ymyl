@@ -1,6 +1,7 @@
 // ===== SEOGEO4YMYL — Hash-based SPA Router =====
 
 import { store } from './core/store.js';
+import { esc } from './utils/html-escape.js';
 
 const routes = new Map();
 let currentCleanup = null;
@@ -49,7 +50,7 @@ async function handleRoute() {
     console.error('[Router] Page render error:', err);
     appRoot.innerHTML = `<div class="container" style="padding-top:80px;text-align:center;">
       <h2 style="color:var(--accent-red)">Page Error</h2>
-      <p style="color:var(--text-secondary)">${err.message}</p>
+      <p style="color:var(--text-secondary)">${esc(err.message)}</p>
     </div>`;
   }
 

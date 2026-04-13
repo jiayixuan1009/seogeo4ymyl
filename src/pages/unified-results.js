@@ -4,6 +4,7 @@
 import { DIMENSION_MAP, VERDICTS } from '../analyzers/unified-engine.js';
 import { EXEC_PRIORITY_META, getCategoryLabel, MAX_VISIBLE_STRATEGIES } from '../utils/strategy-templates.js';
 import { getLlmConfig, saveLlmConfig, streamContent, isLlmConfigured } from '../core/engine/llm-orchestrator.js';
+import { esc } from '../utils/html-escape.js';
 
 /**
  * Render the unified results page
@@ -35,8 +36,8 @@ export function renderUnifiedResults(result) {
 function renderSummaryLayer(summary, meta) {
   const metricsHtml = summary.metrics.map(m => `
     <div style="text-align:center">
-      <div style="font-size:var(--font-size-xs);color:var(--text-muted);margin-bottom:4px">${m.label}</div>
-      <div style="font-size:var(--font-size-lg);font-weight:800;color:${m.color}">${m.value}</div>
+      <div style="font-size:var(--font-size-xs);color:var(--text-muted);margin-bottom:4px">${esc(m.label)}</div>
+      <div style="font-size:var(--font-size-lg);font-weight:800;color:${m.color}">${esc(m.value)}</div>
     </div>
   `).join('');
 
@@ -47,7 +48,7 @@ function renderSummaryLayer(summary, meta) {
     const levelColor = score >= 70 ? 'var(--accent-green)' : score >= 40 ? 'var(--accent-gold)' : 'var(--accent-red)';
     return `
       <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2)">
-        <span style="font-size:var(--font-size-xs);color:var(--text-muted);width:70px;flex-shrink:0">${dim.icon} ${dim.label}</span>
+        <span style="font-size:var(--font-size-xs);color:var(--text-muted);width:70px;flex-shrink:0">${dim.icon} ${esc(dim.label)}</span>
         <div style="flex:1;height:6px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden">
           <div style="height:100%;width:${score}%;background:${levelColor};border-radius:3px;transition:width 1s ease"></div>
         </div>
@@ -63,12 +64,12 @@ function renderSummaryLayer(summary, meta) {
           <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2)">
             <div style="font-size:var(--font-size-4xl);font-weight:900;color:${summary.ratingColor}">${summary.overallScore}</div>
             <div>
-              <div style="font-size:var(--font-size-lg);font-weight:700">${summary.ratingEmoji} ${summary.rating}</div>
-              <div style="font-size:var(--font-size-xs);color:${summary.readinessLabel.color}">${summary.readinessLabel.label}</div>
+              <div style="font-size:var(--font-size-lg);font-weight:700">${summary.ratingEmoji} ${esc(summary.rating)}</div>
+              <div style="font-size:var(--font-size-xs);color:${summary.readinessLabel.color}">${esc(summary.readinessLabel.label)}</div>
             </div>
           </div>
           <div style="font-size:var(--font-size-xs);color:var(--text-muted)">
-            ${safeHost(meta.url)}${meta.keyword ? ` · ${meta.keyword}` : ''}${meta.hasCompetitors ? ` · ${meta.competitorUrls.length} 竞品` : ''}
+            ${esc(safeHost(meta.url))}${meta.keyword ? ` · ${esc(meta.keyword)}` : ''}${meta.hasCompetitors ? ` · ${meta.competitorUrls.length} 竞品` : ''}
           </div>
         </div>
         ${summary.metrics.length > 0 ? `<div style="display:flex;gap:var(--space-5);flex-wrap:wrap">${metricsHtml}</div>` : ''}
@@ -88,11 +89,11 @@ function renderDecisionCard(decision) {
   const conf = Math.round(decision.confidence * 100);
 
   const reasonsHtml = decision.reasons.map(r =>
-    `<div style="display:flex;gap:var(--space-2);padding:2px 0"><span>•</span><span style="font-size:var(--font-size-xs)">${r}</span></div>`
+    `<div style="display:flex;gap:var(--space-2);padding:2px 0"><span>•</span><span style="font-size:var(--font-size-xs)">${esc(r)}</span></div>`
   ).join('');
 
   const actionsHtml = decision.nextActions.map((a, i) =>
-    `<div style="display:flex;gap:var(--space-2);padding:3px 0"><span style="font-size:var(--font-size-xs);font-weight:700;color:var(--text-muted);width:16px">${i + 1}.</span><span style="font-size:var(--font-size-sm)">${a}</span></div>`
+    `<div style="display:flex;gap:var(--space-2);padding:3px 0"><span style="font-size:var(--font-size-xs);font-weight:700;color:var(--text-muted);width:16px">${i + 1}.</span><span style="font-size:var(--font-size-sm)">${esc(a)}</span></div>`
   ).join('');
 
   const signals = decision.allSignals;
@@ -105,7 +106,7 @@ function renderDecisionCard(decision) {
     signals.citationLevel && `引用:${lv(signals.citationLevel)}`,
     signals.igLevel && `增益:${lv(signals.igLevel)}`,
   ].filter(Boolean).map(s =>
-    `<span style="font-size:10px;color:var(--text-muted);background:rgba(255,255,255,0.05);padding:1px 5px;border-radius:3px">${s}</span>`
+    `<span style="font-size:10px;color:var(--text-muted);background:rgba(255,255,255,0.05);padding:1px 5px;border-radius:3px">${esc(s)}</span>`
   ).join(' ') : '';
 
   return `
@@ -113,14 +114,14 @@ function renderDecisionCard(decision) {
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-3)">
         <div>
           <div style="font-size:var(--font-size-xs);color:var(--text-muted);margin-bottom:var(--space-1)">决策引擎判定</div>
-          <div style="font-size:var(--font-size-xl);font-weight:800;color:${v.color}">${v.emoji} ${v.label}</div>
+          <div style="font-size:var(--font-size-xl);font-weight:800;color:${v.color}">${v.emoji} ${esc(v.label)}</div>
         </div>
         <div style="text-align:right">
           <div style="font-size:var(--font-size-xs);color:var(--text-muted)">置信度</div>
           <div style="font-size:var(--font-size-lg);font-weight:800;color:${conf >= 70 ? 'var(--accent-green)' : 'var(--accent-gold)'}">${conf}%</div>
         </div>
       </div>
-      <div style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-bottom:var(--space-3)">${v.template}</div>
+      <div style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-bottom:var(--space-3)">${esc(v.template)}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
         <div style="background:rgba(0,0,0,0.12);padding:var(--space-3);border-radius:8px">
           <div style="font-size:var(--font-size-xs);color:var(--text-muted);font-weight:600;margin-bottom:var(--space-2)">判定依据</div>
@@ -169,8 +170,8 @@ function renderDimensionCard(dimId, dim) {
     <div style="display:flex;gap:var(--space-2);padding:var(--space-2) 0;border-bottom:1px solid rgba(255,255,255,0.04)">
       <span style="flex-shrink:0">${item.impact === 'Critical' ? '🔴' : '🟡'}</span>
       <div style="flex:1">
-        <div style="font-size:var(--font-size-sm)">${item.finding}</div>
-        ${item.fix ? `<div style="font-size:var(--font-size-xs);color:var(--accent-blue);margin-top:2px">💡 ${item.fix}</div>` : ''}
+        <div style="font-size:var(--font-size-sm)">${esc(item.finding)}</div>
+        ${item.fix ? `<div style="font-size:var(--font-size-xs);color:var(--accent-blue);margin-top:2px">💡 ${esc(item.fix)}</div>` : ''}
       </div>
     </div>
   `).join('');
@@ -188,9 +189,9 @@ function renderDimensionCard(dimId, dim) {
         <div style="background:rgba(77,159,255,0.05);padding:var(--space-3);border-radius:8px;border:1px solid rgba(77,159,255,0.15);margin-top:var(--space-3)">
           <div style="font-size:var(--font-size-xs);font-weight:600;color:var(--accent-blue);margin-bottom:var(--space-2)">🎯 关键词匹配</div>
           <div style="display:flex;gap:var(--space-4);flex-wrap:wrap">
-            <span style="font-size:var(--font-size-sm)">Intent: <strong>${intent.label}</strong></span>
+            <span style="font-size:var(--font-size-sm)">Intent: <strong>${esc(intent.label)}</strong></span>
             <span style="font-size:var(--font-size-sm)">匹配度: <strong style="color:${mc}">${ml}</strong></span>
-            <span style="font-size:var(--font-size-sm)">判定: <strong>${verdict.title}</strong></span>
+            <span style="font-size:var(--font-size-sm)">判定: <strong>${esc(verdict.title)}</strong></span>
           </div>
         </div>
       `;
@@ -202,7 +203,7 @@ function renderDimensionCard(dimId, dim) {
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3)">
         <div style="display:flex;align-items:center;gap:var(--space-2)">
           <span style="font-size:var(--font-size-xl)">${dim.icon}</span>
-          <h3 style="font-size:var(--font-size-base);font-weight:700;margin:0">${dim.label}</h3>
+          <h3 style="font-size:var(--font-size-base);font-weight:700;margin:0">${esc(dim.label)}</h3>
         </div>
         <div style="display:flex;align-items:center;gap:var(--space-3)">
           ${dim.issueCount > 0 ? `<span class="badge" style="background:var(--accent-red)22;color:var(--accent-red)">${dim.issueCount} 问题</span>` : ''}
@@ -212,7 +213,7 @@ function renderDimensionCard(dimId, dim) {
       </div>
       ${dim.issueCount > 0 ? `<div style="background:rgba(0,0,0,0.15);padding:var(--space-3);border-radius:8px">${issuesHtml}${more}</div>` : `<div style="text-align:center;padding:var(--space-3);color:var(--accent-green);font-size:var(--font-size-sm)">✅ 全部通过</div>`}
       ${queryExtra}
-      ${dim.passCount > 0 && dim.issueCount > 0 ? `<details style="margin-top:var(--space-3);cursor:pointer"><summary style="font-size:var(--font-size-xs);color:var(--text-muted)">查看 ${dim.passCount} 项通过项</summary><div style="padding:var(--space-2) 0;font-size:var(--font-size-xs);color:var(--text-muted)">${dim.passes.map(p => `<div style="padding:2px 0">✅ ${p.finding}</div>`).join('')}</div></details>` : ''}
+      ${dim.passCount > 0 && dim.issueCount > 0 ? `<details style="margin-top:var(--space-3);cursor:pointer"><summary style="font-size:var(--font-size-xs);color:var(--text-muted)">查看 ${dim.passCount} 项通过项</summary><div style="padding:var(--space-2) 0;font-size:var(--font-size-xs);color:var(--text-muted)">${dim.passes.map(p => `<div style="padding:2px 0">✅ ${esc(p.finding)}</div>`).join('')}</div></details>` : ''}
     </div>
   `;
 }
@@ -226,7 +227,7 @@ function renderCompetitiveCard(dim) {
 
   const rankingHtml = cs ? cs.ranking.map((r, i) => {
     const bc = r.probability >= 50 ? 'var(--accent-green)' : r.probability >= 25 ? 'var(--accent-gold)' : 'var(--accent-red)';
-    return `<div style="display:flex;align-items:center;gap:var(--space-2);padding:4px 0"><span style="font-size:var(--font-size-xs);font-weight:700;width:20px;color:${i === 0 ? 'var(--accent-green)' : 'var(--text-muted)'}">#${i+1}</span><div style="flex:1;font-size:var(--font-size-xs);font-weight:${r.isMe?'700':'400'};color:${r.isMe?'var(--accent-green)':'var(--text-primary)'}">${r.isMe?'🏠 ':''}${safeHost(r.url)}</div><div style="width:60px;height:4px;background:var(--bg-tertiary);border-radius:2px;overflow:hidden"><div style="height:100%;width:${r.probability}%;background:${bc};border-radius:2px"></div></div><span style="font-size:var(--font-size-xs);font-weight:700;color:${bc};width:32px;text-align:right">${r.probability}%</span></div>`;
+    return `<div style="display:flex;align-items:center;gap:var(--space-2);padding:4px 0"><span style="font-size:var(--font-size-xs);font-weight:700;width:20px;color:${i === 0 ? 'var(--accent-green)' : 'var(--text-muted)'}">#${i+1}</span><div style="flex:1;font-size:var(--font-size-xs);font-weight:${r.isMe?'700':'400'};color:${r.isMe?'var(--accent-green)':'var(--text-primary)'}">${r.isMe?'🏠 ':''}${esc(safeHost(r.url))}</div><div style="width:60px;height:4px;background:var(--bg-tertiary);border-radius:2px;overflow:hidden"><div style="height:100%;width:${r.probability}%;background:${bc};border-radius:2px"></div></div><span style="font-size:var(--font-size-xs);font-weight:700;color:${bc};width:32px;text-align:right">${r.probability}%</span></div>`;
   }).join('') : '';
 
   return `
@@ -237,9 +238,9 @@ function renderCompetitiveCard(dim) {
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
         ${cs ? `<div style="background:rgba(0,0,0,0.15);padding:var(--space-3);border-radius:8px"><div style="font-size:var(--font-size-xs);color:var(--text-muted);margin-bottom:var(--space-2)">AI 引用概率排名</div>${rankingHtml}</div>` : ''}
-        ${ig ? `<div style="background:rgba(0,0,0,0.15);padding:var(--space-3);border-radius:8px"><div style="font-size:var(--font-size-xs);color:var(--text-muted);margin-bottom:var(--space-2)">信息增益</div><div style="font-size:var(--font-size-base);font-weight:700;color:${ig.igColor};margin-bottom:var(--space-2)">${ig.igLabel}</div><div style="font-size:var(--font-size-xs);color:var(--text-muted)">原创: ${ig.hasOriginalContent?'✅':'❌'} · 可引用: ${ig.hasCitableValue?'✅':'❌'}</div></div>` : ''}
+        ${ig ? `<div style="background:rgba(0,0,0,0.15);padding:var(--space-3);border-radius:8px"><div style="font-size:var(--font-size-xs);color:var(--text-muted);margin-bottom:var(--space-2)">信息增益</div><div style="font-size:var(--font-size-base);font-weight:700;color:${ig.igColor};margin-bottom:var(--space-2)">${esc(ig.igLabel)}</div><div style="font-size:var(--font-size-xs);color:var(--text-muted)">原创: ${ig.hasOriginalContent?'✅':'❌'} · 可引用: ${ig.hasCitableValue?'✅':'❌'}</div></div>` : ''}
       </div>
-      ${gaps.length > 0 ? `<details style="margin-top:var(--space-3);cursor:pointer"><summary style="font-size:var(--font-size-xs);color:var(--accent-orange);font-weight:600">查看 ${gaps.length} 个差距</summary><div style="background:rgba(0,0,0,0.1);padding:var(--space-2);border-radius:6px;margin-top:var(--space-2)">${gaps.map(g => `<div style="font-size:var(--font-size-xs);padding:2px 0">${g.severity==='critical'?'🔴':g.severity==='warning'?'🟡':'🔵'} ${g.label}</div>`).join('')}</div></details>` : ''}
+      ${gaps.length > 0 ? `<details style="margin-top:var(--space-3);cursor:pointer"><summary style="font-size:var(--font-size-xs);color:var(--accent-orange);font-weight:600">查看 ${gaps.length} 个差距</summary><div style="background:rgba(0,0,0,0.1);padding:var(--space-2);border-radius:6px;margin-top:var(--space-2)">${gaps.map(g => `<div style="font-size:var(--font-size-xs);padding:2px 0">${g.severity==='critical'?'🔴':g.severity==='warning'?'🟡':'🔵'} ${esc(g.label)}</div>`).join('')}</div></details>` : ''}
     </div>
   `;
 }
@@ -256,7 +257,7 @@ function renderActionsLayer(actions) {
 
   const top5Html = top5.map(item => {
     const m = EXEC_PRIORITY_META[item.execPriority] || EXEC_PRIORITY_META.P2;
-    return `<div style="display:flex;gap:var(--space-3);padding:var(--space-2) 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font-size:var(--font-size-base);font-weight:800;color:var(--text-muted);width:20px">${item.rank}</span><div style="flex:1"><div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:2px"><span class="badge" style="background:${m.color}22;color:${m.color};font-size:10px;padding:1px 6px">${item.execPriority}</span><span style="font-size:var(--font-size-sm);font-weight:600">${item.title}</span></div>${item.importance ? `<div style="font-size:var(--font-size-xs);color:var(--text-muted)">${item.importance}</div>` : ''}</div></div>`;
+    return `<div style="display:flex;gap:var(--space-3);padding:var(--space-2) 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font-size:var(--font-size-base);font-weight:800;color:var(--text-muted);width:20px">${item.rank}</span><div style="flex:1"><div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:2px"><span class="badge" style="background:${m.color}22;color:${m.color};font-size:10px;padding:1px 6px">${item.execPriority}</span><span style="font-size:var(--font-size-sm);font-weight:600">${esc(item.title)}</span></div>${item.importance ? `<div style="font-size:var(--font-size-xs);color:var(--text-muted)">${esc(item.importance)}</div>` : ''}</div></div>`;
   }).join('');
 
   const top5Copy = top5.map(i => `${i.rank}. [${i.execPriority}] ${i.title}`).join('\n');
@@ -271,21 +272,21 @@ function renderActionsLayer(actions) {
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-2)">
           <div style="display:flex;gap:var(--space-2);flex-wrap:wrap">
             <span class="badge" style="background:${epm.color}22;color:${epm.color}">${epm.label}</span>
-            ${s.category ? `<span class="badge badge-info">${getCategoryLabel(s.category).icon} ${getCategoryLabel(s.category).label}</span>` : ''}
+            ${s.category ? `<span class="badge badge-info">${getCategoryLabel(s.category).icon} ${esc(getCategoryLabel(s.category).label)}</span>` : ''}
           </div>
           <div style="display:flex;gap:4px">
             ${s.aiPrompt ? `
-              <button class="btn btn-secondary llm-gen-btn" data-prompt="${s.aiPrompt.replace(/"/g,'&quot;')}" data-id="llm-out-${i}" style="font-size:var(--font-size-xs);padding:2px 8px;background:var(--accent-blue);color:white;border:none;">✨ AI 自动生成</button>
-              <button class="btn btn-ghost" style="font-size:var(--font-size-xs)" onclick="navigator.clipboard.writeText(this.dataset.text);this.textContent='已复制!';setTimeout(()=>this.textContent='📋 Prompt',2000)" data-text="${s.aiPrompt.replace(/"/g,'&quot;')}">📋 Prompt</button>
+              <button class="btn btn-secondary llm-gen-btn" data-prompt="${esc(s.aiPrompt)}" data-id="llm-out-${i}" style="font-size:var(--font-size-xs);padding:2px 8px;background:var(--accent-blue);color:white;border:none;">✨ AI 自动生成</button>
+              <button class="btn btn-ghost" style="font-size:var(--font-size-xs)" onclick="navigator.clipboard.writeText(this.dataset.text);this.textContent='已复制!';setTimeout(()=>this.textContent='📋 Prompt',2000)" data-text="${esc(s.aiPrompt)}">📋 Prompt</button>
             ` : ''}
-            <button class="btn btn-ghost" style="font-size:var(--font-size-xs)" onclick="navigator.clipboard.writeText(this.dataset.text);this.textContent='已复制!';setTimeout(()=>this.textContent='📋 动作',2000)" data-text="${(s.action||s.title).replace(/"/g,'&quot;')}">📋 动作</button>
+            <button class="btn btn-ghost" style="font-size:var(--font-size-xs)" onclick="navigator.clipboard.writeText(this.dataset.text);this.textContent='已复制!';setTimeout(()=>this.textContent='📋 动作',2000)" data-text="${esc(s.action || s.title)}">📋 动作</button>
           </div>
         </div>
         ${s.aiPrompt ? `<div id="llm-out-${i}" class="llm-output-container" style="display:none;margin-bottom:var(--space-2);padding:var(--space-3);background:rgba(0,0,0,0.3);border:1px solid rgba(77,159,255,0.2);border-radius:6px;font-size:13px;line-height:1.6;color:var(--text-primary);white-space:pre-wrap;box-shadow:inset 0 2px 10px rgba(0,0,0,0.2);"></div>` : ''}
-        <h4 style="font-size:var(--font-size-sm);font-weight:700;margin-bottom:var(--space-2)">${s.title}</h4>
-        ${s.importance && s.riskOfNotDoing && s.benefitOfDoing ? `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-2);margin-bottom:var(--space-2)"><div style="background:rgba(0,0,0,0.12);padding:6px;border-radius:4px"><div style="font-size:9px;color:var(--text-muted)">为什么重要</div><div style="font-size:var(--font-size-xs);color:var(--text-secondary)">${s.importance}</div></div><div style="background:rgba(255,77,106,0.04);padding:6px;border-radius:4px"><div style="font-size:9px;color:var(--accent-red)">不做的风险</div><div style="font-size:var(--font-size-xs);color:var(--text-secondary)">${s.riskOfNotDoing}</div></div><div style="background:rgba(0,255,136,0.04);padding:6px;border-radius:4px"><div style="font-size:9px;color:var(--accent-green)">做了的收益</div><div style="font-size:var(--font-size-xs);color:var(--text-secondary)">${s.benefitOfDoing}</div></div></div>` : ''}
-        ${s.action && s.action !== s.title ? `<div style="font-size:var(--font-size-xs);color:var(--text-primary);white-space:pre-line;margin-bottom:var(--space-2)">${s.action}</div>` : ''}
-        ${s.codeTemplate ? `<details style="cursor:pointer"><summary style="font-size:var(--font-size-xs);color:var(--accent-blue)">📝 代码模板</summary><div style="background:#1a1c23;border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:var(--space-2);margin-top:var(--space-1)"><pre style="margin:0;overflow-x:auto;font-size:var(--font-size-xs);color:#a5d6ff"><code>${s.codeTemplate.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</code></pre></div></details>` : ''}
+        <h4 style="font-size:var(--font-size-sm);font-weight:700;margin-bottom:var(--space-2)">${esc(s.title)}</h4>
+        ${s.importance && s.riskOfNotDoing && s.benefitOfDoing ? `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-2);margin-bottom:var(--space-2)"><div style="background:rgba(0,0,0,0.12);padding:6px;border-radius:4px"><div style="font-size:9px;color:var(--text-muted)">为什么重要</div><div style="font-size:var(--font-size-xs);color:var(--text-secondary)">${esc(s.importance)}</div></div><div style="background:rgba(255,77,106,0.04);padding:6px;border-radius:4px"><div style="font-size:9px;color:var(--accent-red)">不做的风险</div><div style="font-size:var(--font-size-xs);color:var(--text-secondary)">${esc(s.riskOfNotDoing)}</div></div><div style="background:rgba(0,255,136,0.04);padding:6px;border-radius:4px"><div style="font-size:9px;color:var(--accent-green)">做了的收益</div><div style="font-size:var(--font-size-xs);color:var(--text-secondary)">${esc(s.benefitOfDoing)}</div></div></div>` : ''}
+        ${s.action && s.action !== s.title ? `<div style="font-size:var(--font-size-xs);color:var(--text-primary);white-space:pre-line;margin-bottom:var(--space-2)">${esc(s.action)}</div>` : ''}
+        ${s.codeTemplate ? `<details style="cursor:pointer"><summary style="font-size:var(--font-size-xs);color:var(--accent-blue)">📝 代码模板</summary><div style="background:#1a1c23;border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:var(--space-2);margin-top:var(--space-1)"><pre style="margin:0;overflow-x:auto;font-size:var(--font-size-xs);color:#a5d6ff"><code>${esc(s.codeTemplate)}</code></pre></div></details>` : ''}
       </div>
     `;
   }).join('');
@@ -304,7 +305,7 @@ function renderActionsLayer(actions) {
           </div>
         </div>
         <div style="background:rgba(0,0,0,0.15);padding:var(--space-3);border-radius:8px;margin-bottom:var(--space-3)">${top5Html}</div>
-        <button class="btn btn-ghost" style="font-size:var(--font-size-xs);width:100%" onclick="navigator.clipboard.writeText(this.dataset.text);this.textContent='已复制! ✅';setTimeout(()=>this.textContent='📋 复制 Top 5 清单',2000)" data-text="${top5Copy.replace(/"/g,'&quot;')}">📋 复制 Top 5 清单</button>
+        <button class="btn btn-ghost" style="font-size:var(--font-size-xs);width:100%" onclick="navigator.clipboard.writeText(this.dataset.text);this.textContent='已复制! ✅';setTimeout(()=>this.textContent='📋 复制 Top 5 清单',2000)" data-text="${esc(top5Copy)}">📋 复制 Top 5 清单</button>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4)">
         <div style="display:flex;align-items:center;gap:var(--space-2)">
@@ -337,17 +338,17 @@ function renderLlmModal() {
         
         <div style="margin-bottom:var(--space-3)">
           <label style="display:block;font-size:12px;margin-bottom:4px;color:var(--text-secondary);">Base URL <span style="color:var(--accent-red)">*</span></label>
-          <input type="text" id="llm-base-url" value="${config.baseUrl}" placeholder="https://api.openai.com/v1" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);color:var(--text-primary);padding:8px 12px;border-radius:4px;font-size:14px;" />
+          <input type="text" id="llm-base-url" value="${esc(config.baseUrl)}" placeholder="https://api.openai.com/v1" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);color:var(--text-primary);padding:8px 12px;border-radius:4px;font-size:14px;" />
         </div>
         
         <div style="margin-bottom:var(--space-3)">
           <label style="display:block;font-size:12px;margin-bottom:4px;color:var(--text-secondary);">API Key <span style="color:var(--accent-red)">*</span></label>
-          <input type="password" id="llm-api-key" value="${config.apiKey}" placeholder="sk-..." style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);color:var(--text-primary);padding:8px 12px;border-radius:4px;font-size:14px;" />
+          <input type="password" id="llm-api-key" value="${esc(config.apiKey)}" placeholder="sk-..." style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);color:var(--text-primary);padding:8px 12px;border-radius:4px;font-size:14px;" />
         </div>
         
         <div style="margin-bottom:var(--space-4)">
           <label style="display:block;font-size:12px;margin-bottom:4px;color:var(--text-secondary);">模型名称 (Model) <span style="color:var(--accent-red)">*</span></label>
-          <input type="text" id="llm-model" value="${config.model}" placeholder="gpt-4o-mini" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);color:var(--text-primary);padding:8px 12px;border-radius:4px;font-size:14px;" />
+          <input type="text" id="llm-model" value="${esc(config.model)}" placeholder="gpt-4o-mini" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);color:var(--text-primary);padding:8px 12px;border-radius:4px;font-size:14px;" />
         </div>
         
         <div style="display:flex;justify-content:flex-end;gap:var(--space-2);">
@@ -435,7 +436,7 @@ export function initUnifiedResults(container) {
         e.target.textContent = '✅ 生成完成';
       } catch (err) {
         let errMsg = err.message || String(err);
-        outContainer.innerHTML = `<span style="color:var(--accent-red)">⚠️ 生成出错: ${errMsg}</span>`;
+        outContainer.innerHTML = `<span style="color:var(--accent-red)">⚠️ 生成出错: ${esc(errMsg)}</span>`;
         e.target.textContent = '🔁 重试生成';
         e.target.disabled = false;
         
@@ -452,16 +453,12 @@ export function initUnifiedResults(container) {
 }
 
 function formatChunkToHtml(chunk) {
-  return chunk.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return esc(chunk);
 }
 
 // ============================================================
 // REWRITE STUDIO v2 — Auto-gen + Before/After comparison
 // ============================================================
-
-function esc(str) {
-  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
 
 function lenBadge(val, maxLen) {
   if (!val) return `<span style="font-size:10px;background:rgba(239,68,68,0.15);color:var(--accent-red);padding:1px 7px;border-radius:10px">缺失</span>`;

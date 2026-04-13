@@ -7,6 +7,7 @@ import { fetchSiteResources, clearFetchCache } from '../core/fetcher.js';
 import { parseHtml, enrichPageData } from '../core/parser.js';
 import { getAnalyzerById } from '../analyzers/registry.js';
 import { impactBadgeHtml, confidenceBadgeHtml } from '../core/audit-formatter.js';
+import { esc } from '../utils/html-escape.js';
 
 /**
  * Render a module-specific independent analysis page
@@ -95,7 +96,7 @@ export function renderModulePage(moduleConfig, params = {}) {
       // Validate
       for (const u of urls) {
         try { new URL(u); } catch {
-          resultsArea.innerHTML = `<div class="glass-card" style="color:var(--accent-red)">❌ 无效 URL: ${u}</div>`;
+          resultsArea.innerHTML = `<div class="glass-card" style="color:var(--accent-red)">❌ 无效 URL: ${esc(u)}</div>`;
           return;
         }
       }
@@ -149,8 +150,8 @@ export function renderModulePage(moduleConfig, params = {}) {
       resultsArea.innerHTML = urlResults.map((r, i) => {
         if (r.error) {
           return `<div class="glass-card" style="margin-bottom:var(--space-4);border-color:var(--accent-red)">
-            <strong>${r.url}</strong>
-            <p style="color:var(--accent-red);margin-top:var(--space-2)">❌ ${r.error}</p>
+            <strong>${esc(r.url)}</strong>
+            <p style="color:var(--accent-red);margin-top:var(--space-2)">❌ ${esc(r.error)}</p>
           </div>`;
         }
 
@@ -160,13 +161,13 @@ export function renderModulePage(moduleConfig, params = {}) {
         let itemsHtml = (r.items || []).map(item => `
           <div style="margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid rgba(255,255,255,0.05)">
             <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-2)">
-              <div style="font-weight:600">${item.finding}</div>
+              <div style="font-weight:600">${esc(item.finding)}</div>
               <div>${confidenceBadgeHtml(item.confidence)} ${impactBadgeHtml(item.impact)}</div>
             </div>
             <div style="color:var(--text-secondary);font-size:var(--font-size-sm);margin-bottom:var(--space-2)">
-              ${item.evidence}
+              ${esc(item.evidence)}
             </div>
-            ${item.fix ? `<div style="color:var(--accent-gold);font-size:var(--font-size-sm);margin-bottom:var(--space-2)">🔧 建议: ${item.fix}</div>` : ''}
+            ${item.fix ? `<div style="color:var(--accent-gold);font-size:var(--font-size-sm);margin-bottom:var(--space-2)">🔧 建议: ${esc(item.fix)}</div>` : ''}
             
             ${item.fixCode ? `
             <div style="background:#1a1c23;border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:var(--space-3);margin-top:var(--space-2)">
@@ -174,7 +175,7 @@ export function renderModulePage(moduleConfig, params = {}) {
                 <span style="font-size:var(--font-size-xs);color:var(--text-muted)">修复代码 (Fix Code)</span>
                 <button class="btn btn-ghost" style="padding:0 var(--space-2);font-size:var(--font-size-xs)" onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText);this.innerText='已复制!🥑';setTimeout(()=>this.innerText='复制',2000)">复制</button>
               </div>
-              <pre style="margin:0;overflow-x:auto;font-size:var(--font-size-xs);color:#a5d6ff"><code>${item.fixCode.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>
+              <pre style="margin:0;overflow-x:auto;font-size:var(--font-size-xs);color:#a5d6ff"><code>${esc(item.fixCode)}</code></pre>
             </div>
             ` : ''}
 
@@ -184,7 +185,7 @@ export function renderModulePage(moduleConfig, params = {}) {
                 <span style="font-size:var(--font-size-xs);color:var(--accent-blue);font-weight:600">🎯 AI 语义复审提示词</span>
                 <button class="btn btn-ghost" style="padding:0 var(--space-2);font-size:var(--font-size-xs);color:var(--accent-blue)" onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText);this.innerText='已复制!🥑';setTimeout(()=>this.innerText='复制 Prompt',2000)">复制 Prompt</button>
               </div>
-              <pre style="margin:0;white-space:pre-wrap;font-size:var(--font-size-xs);color:var(--text-secondary)"><code>${item.prompt}</code></pre>
+              <pre style="margin:0;white-space:pre-wrap;font-size:var(--font-size-xs);color:var(--text-secondary)"><code>${esc(item.prompt)}</code></pre>
             </div>
             ` : ''}
           </div>
@@ -197,8 +198,8 @@ export function renderModulePage(moduleConfig, params = {}) {
         return `<div class="glass-card" style="margin-bottom:var(--space-4);animation:slideUp 0.5s ease ${i * 0.1}s both">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4)">
             <div>
-               <strong style="font-size:var(--font-size-base)">${d.url}</strong>
-               <span class="badge badge-info" style="margin-left:var(--space-2)">${d.source}</span>
+               <strong style="font-size:var(--font-size-base)">${esc(d.url)}</strong>
+               <span class="badge badge-info" style="margin-left:var(--space-2)">${esc(d.source)}</span>
             </div>
             <div style="font-size:var(--font-size-xl);font-weight:800;color:${colorClass}">
                ${r.score}

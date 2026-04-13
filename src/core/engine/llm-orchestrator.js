@@ -9,6 +9,9 @@ export const DEFAULT_CONFIG = {
   model: 'deepseek-chat',
 };
 
+// Server-side /api/llm-proxy only forwards to allowlisted hosts (see server.js).
+// Custom OpenAI-compatible hosts: set env LLM_ALLOWED_HOSTS_EXTRA=host.example.com on the Node server.
+
 // Known providers and their CORS support
 // OpenAI official: NO browser CORS (needs backend proxy)
 // DeepSeek:        YES — https://api.deepseek.com/v1

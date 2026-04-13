@@ -1,0 +1,70 @@
+# 推送到 main 或手动触发：构建前端并 rsync 到云服务器，远程 npm ci + PM2 重载。
+#
+# 在 GitHub 仓库 Settings → Secrets and variables → Actions 中配置：
+#   DEPLOY_HOST      服务器 IP 或域名（如 47.x.x.x 或 seo.cryptooptiontool.com）
+#   DEPLOY_USER      SSH 登录用户（如 root 或 deploy）
+#   DEPLOY_PATH      站点根目录，须与 Nginx root 一致（如 /var/www/seotool）
+#   DEPLOY_SSH_KEY   私钥全文（-----BEGIN ... PRIVATE KEY----- 起至 END 止）
+# 可选：
+#   DEPLOY_SSH_PORT  非 22 时填写
+
+name: Deploy to server
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-seotool
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Rsync dist + Node 入口，并 reload PM2
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_SSH_PORT: ${{ secrets.DEPLOY_SSH_PORT }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DEPLOY_HOST:-}" ] || [ -z "${DEPLOY_USER:-}" ] || [ -z "${DEPLOY_PATH:-}" ] || [ -z "${DEPLOY_SSH_KEY:-}" ]; then
+            echo "::error::缺少 Secrets：请配置 DEPLOY_HOST、DEPLOY_USER、DEPLOY_PATH、DEPLOY_SSH_KEY"
+            exit 1
+          fi
+          PORT="${DEPLOY_SSH_PORT:-22}"
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" | tr -d '\r' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          SSH_OPTS="-i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -p $PORT"
+          REMOTE="${DEPLOY_USER}@${DEPLOY_HOST}"
+          QPATH=$(printf '%q' "$DEPLOY_PATH")
+          rsync -avz --delete -e "ssh $SSH_OPTS" dist/ "$REMOTE:$DEPLOY_PATH/"
+          rsync -avz -e "ssh $SSH_OPTS" \
+            server.js package.json package-lock.json ecosystem.config.cjs \
+            "$REMOTE:$DEPLOY_PATH/"
+          ssh $SSH_OPTS "$REMOTE" "cd $QPATH && npm ci --omit=dev && if command -v pm2 >/dev/null 2>&1; then \
+            if pm2 describe seotool-proxy-server >/dev/null 2>&1; then \
+              pm2 reload seotool-proxy-server --update-env; \
+            else \
+              pm2 start ecosystem.config.cjs; \
+            fi; \
+          else \
+            echo '未检测到 pm2，请在站点目录手动执行: node server.js'; \
+          fi"
