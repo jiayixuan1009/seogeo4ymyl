@@ -770,23 +770,16 @@ function initPageRewriteStudio(container) {
   const root = container.querySelector('#rw-studio-root');
   if (!root) return;
 
-  // State
-  const defaultValues = {
-    'rw-title': curTitle,
-    'rw-desc':  curDesc,
-    'rw-h1':    curH1,
-    'rw-intro': '',
-    'rw-faq':   '',
-    'rw-schema': ''
-  };
-
-  const fields = { ...defaultValues };
+  const fields = {};
+  const defaultValues = {};
 
   // Seed with current page values from textareas
-  for (const id of Object.keys(fields)) {
+  ['rw-title', 'rw-desc', 'rw-h1', 'rw-intro', 'rw-faq', 'rw-schema'].forEach(id => {
     const ta = root.querySelector(`#${id}-ta`);
-    if (ta) fields[id] = ta.value || '';
-  }
+    const val = ta ? ta.value || '' : '';
+    fields[id] = val;
+    defaultValues[id] = val;
+  });
 
   // ── Code refresh ──────────────────────────────────────────────────────────
   function refreshCode() {
