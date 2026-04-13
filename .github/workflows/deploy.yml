@@ -48,7 +48,7 @@ jobs:
     # 部署失败不导致 workflow 失败（GitHub 会在本 job 上显示警告，便于你点开看日志）
     continue-on-error: true
     runs-on: ubuntu-latest
-    if: ${{ secrets.DEPLOY_HOST != '' && secrets.DEPLOY_USER != '' && secrets.DEPLOY_PATH != '' && secrets.DEPLOY_SSH_KEY != '' }}
+    # 注意：job 的 if 里不能使用 secrets 上下文；是否部署在下方 shell 里判断。
     steps:
       - uses: actions/checkout@v6
 
@@ -66,6 +66,10 @@ jobs:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           DEPLOY_SSH_PORT: ${{ secrets.DEPLOY_SSH_PORT }}
         run: |
+          if [ -z "${DEPLOY_HOST:-}" ] || [ -z "${DEPLOY_USER:-}" ] || [ -z "${DEPLOY_PATH:-}" ] || [ -z "${DEPLOY_SSH_KEY:-}" ]; then
+            echo "::notice title=Skip deploy::未配置 DEPLOY_HOST / DEPLOY_USER / DEPLOY_PATH / DEPLOY_SSH_KEY 时跳过 rsync。"
+            exit 0
+          fi
           set -eo pipefail
           PORT="${DEPLOY_SSH_PORT:-22}"
           if [ -z "$PORT" ]; then PORT=22; fi
