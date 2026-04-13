@@ -6,7 +6,8 @@ import rateLimit from 'express-rate-limit';
 import { Agent, fetch as undiciFetch } from 'undici';
 import dotenv from 'dotenv';
 
-dotenv.config();
+// Force override to prevent PM2 cluster from caching old API keys indefinitely
+dotenv.config({ override: true });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -116,7 +117,8 @@ app.post('/api/llm-proxy', async (req, res) => {
   try {
     // Inject API Key from secure backend environment, forcefully overriding any stale frontend keys
     if (!options.headers) options.headers = {};
-    const serverPresetKey = process.env.LLM_API_KEY || 'sk-none';
+    const rawKey = process.env.LLM_API_KEY || 'sk-none';
+    const serverPresetKey = rawKey.trim().replace(/['"]/g, '');
     options.headers['Authorization'] = `Bearer ${serverPresetKey}`;
 
     // Native node fetch uses strict TLS verification, securely protecting OpenAI traffic.
