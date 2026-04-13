@@ -681,7 +681,7 @@ function renderPageRewriteStudio(result) {
       </div>
 
       <!-- Two-column layout -->
-      <div id="rw-layout-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);align-items:start;transition:all 0.3s">
+      <div id="rw-layout-grid" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--space-4);align-items:start;transition:all 0.3s">
 
         <!-- ── LEFT: Before / After Fields ── -->
         <div>
