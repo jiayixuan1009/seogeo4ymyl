@@ -1,6 +1,6 @@
-# build：与 Vite 8 的 Node 要求一致（^20.19 或 >=22.12）；deploy：可选，continue-on-error
-# 若仓库 Settings → Actions → Workflow permissions 为「Read」默认，须显式授予 actions: write，否则 upload-artifact 会失败。
-# Action 运行时（checkout/setup-node 等）将迁到 Node 24：使用新版 action + 下文 env，见 GitHub changelog 2025-09-19。
+# build：与 Vite 8 的 Node 要求一致（^20.19 或 >=22.12）
+# 构建与 rsync 在同一 job 内完成，跳过 upload-artifact / download-artifact（避免 artifact 权限与多 job 失败点）
+# Action 运行时迁 Node 24：见 https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
 
 name: Deploy to server
 
@@ -14,7 +14,6 @@ env:
 
 permissions:
   contents: read
-  actions: write
 
 concurrency:
   group: deploy-seotool
@@ -26,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      # 与 Vite 8 一致：^20.19（此处为「构建用 Node」，与 Action 自身运行的 Node 24 无关）
+      # 与 Vite 8 一致：^20.19（构建用 Node；与 Action 自身 Node 24 无关）
       - uses: actions/setup-node@v6
         with:
           node-version: '20.19.6'
@@ -47,28 +46,9 @@ jobs:
           test -f dist/index.html
           ls -la dist/
 
-      - name: Upload dist for deploy job
-        uses: actions/upload-artifact@v7
-        with:
-          name: dist
-          path: dist/
-          retention-days: 1
-          if-no-files-found: error
-
-  deploy:
-    needs: build
-    continue-on-error: true
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Download dist
-        uses: actions/download-artifact@v8
-        with:
-          name: dist
-          path: dist
-
+      # 与原先 deploy job 等价；失败不导致整 job 失败（等同原 continue-on-error: true）
       - name: Rsync dist + Node 入口，并 reload PM2
+        continue-on-error: true
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
