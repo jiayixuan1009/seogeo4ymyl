@@ -126,11 +126,11 @@ app.post('/api/llm-proxy', async (req, res) => {
       body: JSON.stringify(options.body),
     });
 
+    // Ensure Express knows this is a continuous SSE stream so it flushes to browser instantly
     res.status(fetchResponse.status);
-    const dropHeaders = ['content-encoding', 'transfer-encoding', 'content-length', 'connection'];
-    for (const [key, val] of fetchResponse.headers) {
-      if (!dropHeaders.includes(key.toLowerCase())) res.setHeader(key, val);
-    }
+    res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
 
     if (fetchResponse.body) {
       for await (const chunk of fetchResponse.body) {
