@@ -938,7 +938,18 @@ function initPageRewriteStudio(container) {
       for (const t of tasks) {
         const ta = root.querySelector(`#${t.id}-ta`);
         const prompt = root.querySelector(`.rw-regen-btn[data-target="${t.id}-ta"]`)?.dataset.prompt || '';
-        if (prompt) await streamToField(t.id, prompt, t.pct, t.label);
+        if (prompt) {
+          try {
+            await streamToField(t.id, prompt, t.pct, t.label);
+          } catch (err) {
+            console.error(`Error generating ${t.id}:`, err);
+            // If it's a missing API key or auth error, abort the entire process
+            if (err.message && (err.message.includes('API Key') || err.message.includes('401') || err.message.includes('Unauthorized'))) {
+              throw err;
+            }
+            // Otherwise (e.g. timeout, parse error), error is already shown in the textarea, just continue to next field
+          }
+        }
       }
       showProgress('全部生成完成', 100);
       setTimeout(hideProgress, 1200);
