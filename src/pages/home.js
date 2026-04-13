@@ -126,18 +126,12 @@ export function renderHomePage() {
               </div>
             </div>
 
-            <div style="display:grid;grid-template-columns:2fr 2fr 1fr;gap:var(--space-2);align-items:end">
+            <div style="display:grid;grid-template-columns:3fr 1fr;gap:var(--space-2);align-items:end">
               <div>
                 <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">API Base URL</div>
                 <input type="text" id="llm-base-url"
                   style="width:100%;font-size:12px;padding:6px 8px"
                   placeholder="https://api.deepseek.com/v1" />
-              </div>
-              <div>
-                <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">API Key <span style="color:var(--accent-red)">*</span></div>
-                <input type="password" id="llm-api-key"
-                  style="width:100%;font-size:12px;padding:6px 8px"
-                  placeholder="粘贴你的 API Key..." autocomplete="off" />
               </div>
               <div>
                 <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Model</div>
@@ -147,7 +141,7 @@ export function renderHomePage() {
               </div>
             </div>
             <div style="margin-top:var(--space-2);display:flex;align-items:center;justify-content:space-between">
-              <span style="font-size:10px;color:var(--text-muted)">存储在浏览器 localStorage，永久生效。DeepSeek/Kimi/百炼/Gemini 均可直接调用，OpenAI 需后端代理。</span>
+              <span style="font-size:10px;color:var(--text-muted)">API 鉴权现已由服务端统一安全接管（读取云端服务器中的专属配置），前端无需再填写 Key。</span>
               <button id="llm-save-home" class="btn btn-secondary" style="font-size:11px;padding:4px 14px;flex-shrink:0">保存</button>
             </div>
           </details>
@@ -230,40 +224,31 @@ export function renderHomePage() {
 
     function updateLlmBadge(cfg) {
       if (!llmStatusBadge) return;
-      if (cfg.apiKey && cfg.apiKey.trim()) {
-        const modelShort = (cfg.model || 'gpt-4o-mini').replace('gpt-', '').slice(0, 12);
-        llmStatusBadge.textContent = `✅ ${modelShort}`;
-        llmStatusBadge.style.background = 'rgba(34,197,94,0.15)';
-        llmStatusBadge.style.color = 'var(--accent-green)';
-      } else {
-        llmStatusBadge.textContent = '⚠️ 未配置';
-        llmStatusBadge.style.background = 'rgba(245,158,11,0.15)';
-        llmStatusBadge.style.color = 'var(--accent-gold)';
-        // Auto-expand if not configured
-        if (llmConfigBar) llmConfigBar.open = true;
-      }
+      const modelShort = (cfg.model || 'gpt-4o-mini').replace('gpt-', '').slice(0, 12);
+      llmStatusBadge.textContent = `✅ Server-auth (${modelShort})`;
+      llmStatusBadge.style.background = 'rgba(34,197,94,0.15)';
+      llmStatusBadge.style.color = 'var(--accent-green)';
+      if (llmConfigBar) llmConfigBar.open = false; // By default close it
     }
 
     // Read saved config and populate fields
     const savedCfg = getLlmConfig();
     if (llmBaseUrlInput)  llmBaseUrlInput.value  = savedCfg.baseUrl || DEFAULT_CONFIG.baseUrl;
-    if (llmApiKeyInput)   llmApiKeyInput.value   = savedCfg.apiKey  || '';
     if (llmModelInput)    llmModelInput.value    = savedCfg.model   || DEFAULT_CONFIG.model;
     updateLlmBadge(savedCfg);
 
     function saveLlmFromBar() {
-      const cfg = {
-        baseUrl: (llmBaseUrlInput?.value || DEFAULT_CONFIG.baseUrl).trim(),
-        apiKey:  (llmApiKeyInput?.value  || '').trim(),
-        model:   (llmModelInput?.value   || DEFAULT_CONFIG.model).trim(),
-      };
-      saveLlmConfig(cfg);
-      updateLlmBadge(cfg);
+      const baseUrl = llmBaseUrlInput.value.trim() || DEFAULT_CONFIG.baseUrl;
+      const model   = llmModelInput.value.trim()   || DEFAULT_CONFIG.model;
+
+      localStorage.setItem('seotool_llm_config', JSON.stringify({ baseUrl, model }));
+      updateLlmBadge({ baseUrl, model });
+      
       if (llmSaveBtn) {
         llmSaveBtn.textContent = '✅ 已保存';
         setTimeout(() => { llmSaveBtn.textContent = '保存'; }, 1800);
       }
-      if (llmConfigBar && cfg.apiKey) llmConfigBar.open = false;
+      if (llmConfigBar) llmConfigBar.open = false;
     }
 
     if (llmSaveBtn)     llmSaveBtn.addEventListener('click', saveLlmFromBar);

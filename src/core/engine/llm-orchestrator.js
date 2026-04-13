@@ -66,10 +66,6 @@ function isCorsBlocked(baseUrl) {
 export async function streamContent(prompt, onChunk) {
   const config = getLlmConfig();
 
-  if (!config.apiKey || !config.apiKey.trim()) {
-    throw new Error('未配置 API Key。请在首页底部「⚙️ AI 设置」中填写 API Key。');
-  }
-
   const baseUrl  = config.baseUrl.replace(/\/$/, '');
   const endpoint = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl}/chat/completions`;
 
@@ -88,35 +84,21 @@ export async function streamContent(prompt, onChunk) {
 
   let response;
   try {
-    if (isCorsBlocked(baseUrl)) {
-      // route via our new private Node proxy to bypass strict browser CORS
-      response = await fetch('/api/llm-proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          targetUrl: endpoint,
-          options: {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${config.apiKey.trim()}`,
-            },
-            body: payload,
-          }
-        }),
-      });
-    } else {
-      // standard fetch
-      response = await fetch(endpoint, {
-        method:  'POST',
-        mode:    'cors',
-        headers: {
-          'Content-Type':  'application/json',
-          'Authorization': `Bearer ${config.apiKey.trim()}`,
-        },
-        body: JSON.stringify(payload),
-      });
-    }
+    // ALWAYS route via our private Node proxy to securely inject API keys server-side
+    response = await fetch('/api/llm-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        targetUrl: endpoint,
+        options: {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: payload,
+        }
+      }),
+    });
   } catch (fetchErr) {
     throw new Error(
       `网络请求失败 (${fetchErr.message})。\n` +

@@ -4,6 +4,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import rateLimit from 'express-rate-limit';
 import { Agent, fetch as undiciFetch } from 'undici';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -111,6 +114,13 @@ app.post('/api/llm-proxy', async (req, res) => {
   if (!isUrlSafe(targetUrl)) return res.status(403).json({ error: 'SSRF Protection: Invalid LLM endpoint' });
 
   try {
+    // Inject API Key from secure backend environment
+    if (!options.headers) options.headers = {};
+    if (!options.headers['Authorization'] || options.headers['Authorization'] === 'Bearer ') {
+      const serverPresetKey = process.env.LLM_API_KEY || 'sk-none';
+      options.headers['Authorization'] = `Bearer ${serverPresetKey}`;
+    }
+
     // Native node fetch uses strict TLS verification, securely protecting OpenAI traffic.
     const fetchResponse = await fetch(targetUrl, {
       method: options.method || 'POST',
