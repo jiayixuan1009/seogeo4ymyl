@@ -839,13 +839,6 @@ function initPageRewriteStudio(container) {
       
       const p = root.querySelector(`#rw-tab-${btn.dataset.tab}`);
       if (p) p.style.display = 'block';
-
-      // Dynamic width layout adjustment per user request
-      const layoutGrid = root.querySelector('#rw-layout-grid');
-      if (layoutGrid) {
-        if (btn.dataset.tab === 'head') layoutGrid.style.gridTemplateColumns = '50% 50%'; // 50% width
-        else layoutGrid.style.gridTemplateColumns = '30% 70%'; // More space for Body
-      }
     });
   });
 
