@@ -148,8 +148,14 @@ function buildInsights(moduleResults, queryAnalysis, competitiveAnalysis, isFint
       totalScore += result.rawScore;
 
       for (const item of (result.items || [])) {
+        let fix = item.fix;
+        if (!fix && (item.impact === 'Critical' || item.impact === 'Warning')) {
+          fix = `需进一步检查并补充完善：${item.finding.replace(/⚠️ |🔥 /g, '')}`;
+        }
+        
         items.push({
           ...item,
+          fix,
           sourceModule: modId,
         });
       }

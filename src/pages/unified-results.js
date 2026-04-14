@@ -176,7 +176,22 @@ function renderDimensionCard(dimId, dim) {
     </div>
   `).join('');
 
-  const more = dim.issues.length > 5 ? `<div class="text-xs text-muted" style="padding:var(--space-2) 0">还有 ${dim.issues.length - 5} 项...</div>` : '';
+  const more = dim.issues.length > 5 ? `
+    <details class="mt-3 cursor-pointer">
+      <summary class="text-xs text-muted hover:text-white" style="padding:var(--space-2) 0">点击查看还有 ${dim.issues.length - 5} 项此维度的优化项</summary>
+      <div style="padding-top:var(--space-2)">
+        ${dim.issues.slice(5).map(item => `
+          <div class="gap-2" style="display:flex; padding:var(--space-2) 0; border-bottom:1px solid rgba(255,255,255,0.04)">
+            <span class="shrink-0">${item.impact === 'Critical' ? '🔴' : '🟡'}</span>
+            <div style="flex:1">
+              <div class="text-sm">${esc(item.finding)}</div>
+              ${item.fix ? `<div class="text-xs text-accent-blue" style="margin-top:2px">💡 ${esc(item.fix)}</div>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </details>
+  ` : '';
 
   let queryExtra = '';
   if (dim.queryAnalysis) {
